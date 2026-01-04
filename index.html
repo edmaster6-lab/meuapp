@@ -9,8 +9,6 @@
     <meta name="apple-web-app-capable" content="yes">
     <meta name="theme-color" content="#2563eb">
     
-    <link rel="manifest" href="data:application/manifest+json,{'name':'Transporte Pro','short_name':'TranspPro','start_url':'.','display':'standalone','background_color':'#f1f5f9','theme_color':'#2563eb','icons':[{'src':'https://cdn-icons-png.flaticon.com/512/713/713311.png','sizes':'512x512','type':'image/png'}]}">
-
     <style>
         :root {
             --primary: #2563eb;
@@ -28,13 +26,13 @@
         .header-main { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
         .header-main h1 { font-size: 18px; margin: 0; color: var(--primary); }
 
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; position: sticky; top: 0; background: white; z-index: 10; padding: 5px 0; }
-        .tab-btn { flex: 1; padding: 12px 5px; border: none; background: #e2e8f0; cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 11px; color: #64748b; }
+        .tabs { display: flex; gap: 4px; margin-bottom: 15px; position: sticky; top: 0; background: white; z-index: 10; padding: 5px 0; overflow-x: auto; }
+        .tab-btn { flex: 1; min-width: 80px; padding: 12px 5px; border: none; background: #e2e8f0; cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 10px; color: #64748b; text-transform: uppercase; }
         .tab-btn.active { background: var(--primary); color: white; }
 
         .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-        th { background: #1e293b; color: white; padding: 12px; font-size: 11px; text-align: center; position: sticky; top: 0; }
+        th { background: #1e293b; color: white; padding: 12px; font-size: 11px; text-align: center; }
         th:first-child { position: sticky; left: 0; z-index: 3; background: #1e293b; text-align: left; min-width: 140px; }
         td:first-child { position: sticky; left: 0; z-index: 2; background: white; text-align: left; font-weight: bold; border-right: 2px solid #f1f5f9; }
         td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 12px; text-align: center; }
@@ -43,17 +41,20 @@
         .status-pago { background: #dcfce7; color: #166534; }
         .status-aberto { background: #fef9c3; color: #854d0e; }
 
-        input, select { width: 100%; padding: 14px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; background: white; }
+        input, select, textarea { width: 100%; padding: 14px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; background: white; }
+        textarea { height: 120px; font-family: monospace; font-size: 14px; resize: none; margin-bottom: 5px; }
         
         .btn { padding: 8px 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; text-align: center; }
         .btn-primary { background: var(--primary); color: white; width: 100%; }
         .btn-recibo { background: #6366f1; color: white; margin-top: 4px; width: 100%; display: block; }
+        .btn-cobranca { background: var(--danger); color: white; margin-top: 4px; width: 100%; display: block; }
         .btn-ws { background: #25d366; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; margin-left: 5px; font-size: 14px; }
 
         .financeiro { margin-top: 15px; padding: 12px; background: #1e293b; border-radius: 10px; color: white; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .fin-card h4 { margin: 0; font-size: 9px; color: #94a3b8; text-transform: uppercase; }
         .fin-card p { margin: 4px 0 0 0; font-size: 15px; font-weight: bold; }
 
+        .config-label { font-weight: bold; font-size: 13px; display: block; margin-top: 10px; color: var(--primary); }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -62,13 +63,14 @@
 <div class="container">
     <header class="header-main">
         <span>🚌</span>
-        <h1>Transporte Pro <small style="font-size: 9px; opacity: 0.7;">Offline v1.3.5</small></h1>
+        <h1>Transporte Pro</h1>
     </header>
 
     <nav class="tabs">
-        <button class="tab-btn active" id="btn-painel" onclick="showTab('painel')">PAGAMENTOS</button>
-        <button class="tab-btn" id="btn-detalhes" onclick="showTab('detalhes')">ALUNOS</button>
-        <button class="tab-btn" id="btn-cadastro" onclick="showTab('cadastro')">+ NOVO</button>
+        <button class="tab-btn active" id="btn-painel" onclick="showTab('painel')">Pagamentos</button>
+        <button class="tab-btn" id="btn-detalhes" onclick="showTab('detalhes')">Alunos</button>
+        <button class="tab-btn" id="btn-cadastro" onclick="showTab('cadastro')">Novo</button>
+        <button class="tab-btn" id="btn-config" onclick="showTab('config')">Config</button>
     </nav>
 
     <section id="painel">
@@ -82,11 +84,6 @@
         <div class="financeiro">
             <div class="fin-card"><h4>Recebido (<span id="txtMesAtivo">...</span>)</h4><p id="mRecebido" style="color:var(--success)">R$ 0,00</p></div>
             <div class="fin-card"><h4>Pendente (<span id="txtMesAtivo2">...</span>)</h4><p id="mReceber" style="color:var(--warning)">R$ 0,00</p></div>
-        </div>
-        <div style="margin-top:10px; display:flex; gap:8px;">
-            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Backup</button>
-            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Importar</button>
-            <input type="file" id="importFile" style="display:none" onchange="importarJSON(event)">
         </div>
     </section>
 
@@ -106,16 +103,42 @@
             <select id="turno"><option value="Manhã">Manhã</option><option value="Tarde">Tarde</option><option value="Noite">Noite</option></select>
             <input type="number" step="0.01" id="valor" placeholder="Valor Mensalidade R$" required>
             <input type="number" id="vencimento" placeholder="Dia Vencimento (1-31)" required>
-            <input type="text" id="responsavel" placeholder="Responsável">
             <input type="text" id="telefone" placeholder="Telefone (DDD) 99999-9999" oninput="maskTel(this)">
             <button type="submit" class="btn btn-primary" style="padding:15px; font-size:14px">SALVAR DADOS</button>
         </form>
+    </section>
+
+    <section id="config" class="hidden">
+        <h3>Configurações de Mensagens</h3>
+        <p style="font-size: 11px; color: #64748b; margin-bottom: 15px;">Use <b>{nome}</b>, <b>{mes}</b> e <b>{valor}</b> para preenchimento automático.</p>
+        
+        <label class="config-label">Mensagem de Recibo (Pago)</label>
+        <textarea id="msgRecibo"></textarea>
+        
+        <label class="config-label">Mensagem de Cobrança (Pendente)</label>
+        <textarea id="msgCobranca"></textarea>
+        
+        <button class="btn btn-primary" onclick="salvarConfig()" style="padding:15px; margin-bottom: 20px;">SALVAR MENSAGENS</button>
+        
+        <hr>
+        <h3>Dados do Sistema</h3>
+        <div style="display:flex; gap:8px;">
+            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Fazer Backup</button>
+            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Importar Backup</button>
+            <input type="file" id="importFile" style="display:none" onchange="importarJSON(event)">
+        </div>
     </section>
 </div>
 
 <script>
     let passageiros = JSON.parse(localStorage.getItem('van_dados_v1')) || [];
     const meses = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    
+    const msgPadraoRecibo = "*CONFIRMAÇÃO DE PAGAMENTO*\n\nOlá, informamos que o seu pagamento foi processado com sucesso.\n\n- *Passageiro:* {nome}\n- *Mês:* {mes}\n- *Valor:* R$ {valor}\n- *Status:* PAGO ✅";
+    const msgPadraoCobranca = "*AVISO DE VENCIMENTO*\n\nOlá, notamos que o pagamento de {nome} referente ao mês de {mes} ainda não consta em nosso sistema.\n\n- *Valor:* R$ {valor}\n\nCaso já tenha efetuado, por favor desconsidere ou envie o comprovante.";
+
+    let configMsg = localStorage.getItem('van_msg_recibo') || msgPadraoRecibo;
+    let configCobranca = localStorage.getItem('van_msg_cobranca') || msgPadraoCobranca;
 
     function maskTel(i) {
         let v = i.value.replace(/\D/g, "");
@@ -129,19 +152,30 @@
         document.getElementById(tabId).classList.remove('hidden');
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('btn-' + tabId).classList.add('active');
+        
         if(tabId === 'painel') renderPainel();
         if(tabId === 'detalhes') renderDetalhes();
+        if(tabId === 'config') {
+            document.getElementById('msgRecibo').value = configMsg;
+            document.getElementById('msgCobranca').value = configCobranca;
+        }
+    }
+
+    function salvarConfig() {
+        configMsg = document.getElementById('msgRecibo').value;
+        configCobranca = document.getElementById('msgCobranca').value;
+        localStorage.setItem('van_msg_recibo', configMsg);
+        localStorage.setItem('van_msg_cobranca', configCobranca);
+        alert("Configurações salvas!");
     }
 
     function renderPainel() {
         const hMeses = document.getElementById('headerMeses');
         const corpo = document.getElementById('corpoPainel');
         const busca = document.getElementById('buscaNome').value.toLowerCase();
-        
         const dataHoje = new Date();
+        const diaAtual = dataHoje.getDate();
         const mesRealIdx = dataHoje.getMonth();
-        
-        // Se for Janeiro (0), aponta para Fevereiro para exibir as somas de Fev nos cards.
         let mesAtualNome = (mesRealIdx === 0) ? "Fev" : meses[mesRealIdx - 1];
 
         document.getElementById('txtMesAtivo').innerText = mesAtualNome;
@@ -161,17 +195,20 @@
 
             meses.forEach(m => {
                 const isPago = p.pagamentos && p.pagamentos[m];
+                const vencido = diaAtual >= parseInt(p.vencimento);
                 
                 if(m === mesAtualNome) { 
                     const valorNum = parseFloat(p.valor) || 0;
-                    if(isPago) mRec += valorNum; 
-                    else mPend += valorNum; 
+                    if(isPago) mRec += valorNum; else mPend += valorNum; 
                 }
 
                 rowHtml += `<td>
                     <span class="status-badge ${isPago ? 'status-pago' : 'status-aberto'}">${isPago ? 'PAGO' : 'ABERTO'}</span>
                     <button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1" onclick="togglePagamento(${p.id}, '${m}')">Alt</button>
-                    ${isPago ? `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄</button>` : ''}
+                    ${isPago ? 
+                        `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : 
+                        (vencido ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')
+                    }
                 </td>`;
             });
             const tr = document.createElement('tr');
@@ -193,12 +230,16 @@
 
     function enviarRecibo(id, mes) {
         const p = passageiros.find(x => x.id == id);
-        const valorFormatado = parseFloat(p.valor).toLocaleString('pt-br', {minimumFractionDigits:2});
-        
-        // --- TEXTO COM EMOJIS UNIVERSAIS ---
-        const texto = `*CONFIRMAÇÃO DE PAGAMENTO*%0A%0AOlá, pagamento referente ao transporte realizado.%0A%0A*DADOS DO RECIBO:*%0A- *Passageiro:* ${p.nome.toUpperCase()}%0A- *Mês:* ${mes.toUpperCase()}%0A- *Valor:* R$ ${valorFormatado}%0A- *Status:* PAGO ✅%0A%0AAgradecemos a confiança!%0A----------------------------%0A*Mensagem automática - TRANSPORTE PRO*`;
-        
-        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${texto}`, '_blank');
+        const valorF = parseFloat(p.valor).toLocaleString('pt-br', {minimumFractionDigits:2});
+        let textoFinal = configMsg.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, valorF);
+        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(textoFinal)}`, '_blank');
+    }
+
+    function enviarCobranca(id, mes) {
+        const p = passageiros.find(x => x.id == id);
+        const valorF = parseFloat(p.valor).toLocaleString('pt-br', {minimumFractionDigits:2});
+        let textoFinal = configCobranca.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, valorF);
+        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(textoFinal)}`, '_blank');
     }
 
     document.getElementById('formCadastro').addEventListener('submit', (e) => {
@@ -210,7 +251,6 @@
             turno: document.getElementById('turno').value, 
             valor: parseFloat(document.getElementById('valor').value), 
             vencimento: parseInt(document.getElementById('vencimento').value), 
-            responsavel: document.getElementById('responsavel').value, 
             telefone: document.getElementById('telefone').value, 
             pagamentos: id ? (passageiros.find(x => x.id == id).pagamentos || {}) : {} 
         };
@@ -236,7 +276,6 @@
         document.getElementById('turno').value = p.turno;
         document.getElementById('valor').value = p.valor;
         document.getElementById('vencimento').value = p.vencimento;
-        document.getElementById('responsavel').value = p.responsavel;
         document.getElementById('telefone').value = p.telefone;
         showTab('cadastro');
     }
