@@ -196,7 +196,7 @@
         const valorFormatado = parseFloat(p.valor).toLocaleString('pt-br', {minimumFractionDigits:2});
         
         // --- TEXTO COM EMOJIS UNIVERSAIS ---
-        const texto = `*CONFIRMAÇÃO DE PAGAMENTO*%0A%0AOlá, informamos que o seu pagamento foi processado com sucesso.%0A%0A*DADOS DO RECIBO:*%0A- *Passageiro:* ${p.nome.toUpperCase()}%0A- *Mês:* ${mes.toUpperCase()}%0A- *Valor:* R$ ${valorFormatado}%0A- *Status:* PAGO ✅%0A%0AAgradecemos a preferência!%0A----------------------------%0A*TRANSPORTE PRO*`;
+        const texto = `*CONFIRMAÇÃO DE PAGAMENTO*%0A%0AOlá, pagamento referente ao transporte realizado.%0A%0A*DADOS DO RECIBO:*%0A- *Passageiro:* ${p.nome.toUpperCase()}%0A- *Mês:* ${mes.toUpperCase()}%0A- *Valor:* R$ ${valorFormatado}%0A- *Status:* PAGO ✅%0A%0AAgradecemos a confiança!%0A----------------------------%0A*Mensagem automática - TRANSPORTE PRO*`;
         
         window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${texto}`, '_blank');
     }
