@@ -138,9 +138,8 @@
         const corpo = document.getElementById('corpoPainel');
         const busca = document.getElementById('buscaNome').value.toLowerCase();
         
-        // Ajuste para detectar o mês atual baseado no seu array que começa em Fev
         const dataHoje = new Date();
-        const mesRealIdx = dataHoje.getMonth(); // 0 = Jan, 1 = Fev...
+        const mesRealIdx = dataHoje.getMonth(); 
         const mesAtualNome = meses[mesRealIdx - 1] || "Dez";
 
         hMeses.innerHTML = '<th>Passageiro</th>';
@@ -158,9 +157,9 @@
             meses.forEach(m => {
                 const isPago = p.pagamentos && p.pagamentos[m];
                 
-                // Soma financeira corrigida
                 if(m === mesAtualNome) { 
-                    const valorNum = parseFloat(p.valor) || 0;
+                    // CORREÇÃO: Converter explicitamente para Number para evitar erro na soma
+                    const valorNum = Number(p.valor) || 0;
                     if(isPago) mRec += valorNum; 
                     else mPend += valorNum; 
                 }
