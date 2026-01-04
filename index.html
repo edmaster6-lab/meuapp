@@ -80,8 +80,8 @@
             </table>
         </div>
         <div class="financeiro">
-            <div class="fin-card"><h4>Recebido (Mês)</h4><p id="mRecebido" style="color:var(--success)">R$ 0,00</p></div>
-            <div class="fin-card"><h4>Pendente (Mês)</h4><p id="mReceber" style="color:var(--warning)">R$ 0,00</p></div>
+            <div class="fin-card"><h4>Recebido (<span id="txtMesAtivo">...</span>)</h4><p id="mRecebido" style="color:var(--success)">R$ 0,00</p></div>
+            <div class="fin-card"><h4>Pendente (<span id="txtMesAtivo2">...</span>)</h4><p id="mReceber" style="color:var(--warning)">R$ 0,00</p></div>
         </div>
         <div style="margin-top:10px; display:flex; gap:8px;">
             <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Backup</button>
@@ -139,8 +139,13 @@
         const busca = document.getElementById('buscaNome').value.toLowerCase();
         
         const dataHoje = new Date();
-        const mesRealIdx = dataHoje.getMonth(); 
-        const mesAtualNome = meses[mesRealIdx - 1] || "Dez";
+        const mesRealIdx = dataHoje.getMonth();
+        
+        // Se for Janeiro (0), aponta para Fevereiro para exibir as somas de Fev nos cards.
+        let mesAtualNome = (mesRealIdx === 0) ? "Fev" : meses[mesRealIdx - 1];
+
+        document.getElementById('txtMesAtivo').innerText = mesAtualNome;
+        document.getElementById('txtMesAtivo2').innerText = mesAtualNome;
 
         hMeses.innerHTML = '<th>Passageiro</th>';
         meses.forEach(m => { 
@@ -158,8 +163,7 @@
                 const isPago = p.pagamentos && p.pagamentos[m];
                 
                 if(m === mesAtualNome) { 
-                    // CORREÇÃO: Converter explicitamente para Number para evitar erro na soma
-                    const valorNum = Number(p.valor) || 0;
+                    const valorNum = parseFloat(p.valor) || 0;
                     if(isPago) mRec += valorNum; 
                     else mPend += valorNum; 
                 }
@@ -174,6 +178,7 @@
             tr.innerHTML = rowHtml;
             corpo.appendChild(tr);
         });
+
         document.getElementById('mRecebido').innerText = `R$ ${mRec.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
         document.getElementById('mReceber').innerText = `R$ ${mPend.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
     }
@@ -189,7 +194,10 @@
     function enviarRecibo(id, mes) {
         const p = passageiros.find(x => x.id == id);
         const valorFormatado = parseFloat(p.valor).toLocaleString('pt-br', {minimumFractionDigits:2});
-        const texto = `*🧾 COMPROVANTE DE PAGAMENTO*%0A------------------------------------------%0A*ALUNO:* ${p.nome.toUpperCase()}%0A*MÊS:* ${mes.toUpperCase()}%0A*VALOR:* R$ ${valorFormatado}%0A*STATUS:* PAGO ✅%0A------------------------------------------%0A_Obrigado!_ 🚌`;
+        
+        // --- TEXTO COM EMOJIS UNIVERSAIS ---
+        const texto = `*CONFIRMAÇÃO DE PAGAMENTO*%0A%0AOlá, informamos que o seu pagamento foi processado com sucesso.%0A%0A*DADOS DO RECIBO:*%0A- *Passageiro:* ${p.nome.toUpperCase()}%0A- *Mês:* ${mes.toUpperCase()}%0A- *Valor:* R$ ${valorFormatado}%0A- *Status:* PAGO ✅%0A%0AAgradecemos a preferência!%0A----------------------------%0A*TRANSPORTE PRO*`;
+        
         window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${texto}`, '_blank');
     }
 
@@ -204,7 +212,7 @@
             vencimento: parseInt(document.getElementById('vencimento').value), 
             responsavel: document.getElementById('responsavel').value, 
             telefone: document.getElementById('telefone').value, 
-            pagamentos: id ? passageiros.find(x => x.id == id).pagamentos : {} 
+            pagamentos: id ? (passageiros.find(x => x.id == id).pagamentos || {}) : {} 
         };
         if(id) passageiros[passageiros.findIndex(x => x.id == id)] = p;
         else passageiros.push(p);
@@ -236,19 +244,8 @@
     function excluir(id) { if(confirm("Remover aluno?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
     function abrirZap(t) { window.open(`https://wa.me/55${t.replace(/\D/g,'')}`, '_blank'); }
     function exportarJSON() { const blob = new Blob([JSON.stringify(passageiros)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_transporte.json`; a.click(); }
-    function importarJSON(e) { const reader = new FileReader(); reader.onload = (ev) => { passageiros = JSON.parse(ev.target.result); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderPainel(); }; reader.readAsText(e.target.files[0]); }
+    function importarJSON(e) { const reader = new FileReader(); reader.onload = (ev) => { try { passageiros = JSON.parse(ev.target.result); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderPainel(); } catch(err) { alert("Arquivo inválido"); } }; reader.readAsText(e.target.files[0]); }
     
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('data:text/javascript;base64,' + btoa(`
-            self.addEventListener('install', (e) => {
-                e.waitUntil(caches.open('v1').then((cache) => cache.addAll(['/'])));
-            });
-            self.addEventListener('fetch', (e) => {
-                e.respondWith(caches.match(e.request).then((res) => res || fetch(e.request)));
-            });
-        `));
-    }
-
     window.onload = renderPainel;
 </script>
 </body>
