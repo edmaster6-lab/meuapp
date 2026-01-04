@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Transporte Escolar Pro - v1.3.3</title>
+    <title>Transporte Pro</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Transporte Pro">
-    <meta name="apple-mobile-web-app-title" content="Transporte Pro">
     <meta name="theme-color" content="#2563eb">
-    <meta name="msapplication-navbutton-color" content="#2563eb">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="data:application/manifest+json,{'name':'Transporte Escolar Pro','short_name':'TranspPro','start_url':'.','display':'standalone','background_color':'#f1f5f9','theme_color':'#2563eb','icons':[{'src':'https://cdn-icons-png.flaticon.com/512/713/713311.png','sizes':'512x512','type':'image/png'}]}">
+    
+    <link rel="manifest" href="data:application/manifest+json,{'name':'Transporte Pro','short_name':'TranspPro','start_url':'.','display':'standalone','background_color':'#f1f5f9','theme_color':'#2563eb','icons':[{'src':'https://cdn-icons-png.flaticon.com/512/713/713311.png','sizes':'512x512','type':'image/png'}]}">
+
     <style>
         :root {
             --primary: #2563eb;
@@ -23,54 +21,39 @@
             --text: #1e293b;
         }
 
+        /* Reset para Mobile */
         * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; }
+        body { background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
 
         .container { max-width: 100%; background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-
         .header-main { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
         .header-main h1 { font-size: 18px; margin: 0; color: var(--primary); }
 
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab-btn { 
-            flex: 1; padding: 12px 5px; border: none; background: #e2e8f0; cursor: pointer; 
-            border-radius: 8px; font-weight: bold; font-size: 11px; color: #64748b;
-        }
+        /* Abas de Navegação */
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; position: sticky; top: 0; background: white; z-index: 10; padding: 5px 0; }
+        .tab-btn { flex: 1; padding: 12px 5px; border: none; background: #e2e8f0; cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 11px; color: #64748b; }
         .tab-btn.active { background: var(--primary); color: white; }
 
-        .table-container { 
-            overflow-x: auto; 
-            border-radius: 8px; 
-            border: 1px solid #e2e8f0;
-            background: #fff;
-        }
+        /* Tabela Mobile com Nome Fixo */
+        .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-        
         th { background: #1e293b; color: white; padding: 12px; font-size: 11px; text-align: center; position: sticky; top: 0; }
-        
         th:first-child { position: sticky; left: 0; z-index: 3; background: #1e293b; text-align: left; min-width: 140px; }
-        td:first-child { 
-            position: sticky; left: 0; z-index: 2; background: white; 
-            text-align: left; font-weight: bold; border-right: 2px solid #f1f5f9;
-        }
-
+        td:first-child { position: sticky; left: 0; z-index: 2; background: white; text-align: left; font-weight: bold; border-right: 2px solid #f1f5f9; }
         td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 12px; text-align: center; }
 
         .status-badge { padding: 4px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; display: block; margin-bottom: 4px; }
         .status-pago { background: #dcfce7; color: #166534; }
         .status-aberto { background: #fef9c3; color: #854d0e; }
 
-        input, select { width: 100%; padding: 14px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; }
+        input, select { width: 100%; padding: 14px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; background: white; }
         
-        .btn { padding: 8px 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .btn { padding: 8px 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; text-align: center; }
         .btn-primary { background: var(--primary); color: white; width: 100%; }
         .btn-recibo { background: #6366f1; color: white; margin-top: 4px; width: 100%; display: block; }
         .btn-ws { background: #25d366; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; margin-left: 5px; font-size: 14px; }
 
-        .financeiro { 
-            margin-top: 15px; padding: 12px; background: #1e293b; border-radius: 10px; color: white;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
-        }
+        .financeiro { margin-top: 15px; padding: 12px; background: #1e293b; border-radius: 10px; color: white; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .fin-card h4 { margin: 0; font-size: 9px; color: #94a3b8; text-transform: uppercase; }
         .fin-card p { margin: 4px 0 0 0; font-size: 15px; font-weight: bold; }
 
@@ -82,14 +65,14 @@
 <div class="container">
     <header class="header-main">
         <span>🚌</span>
-        <h1>Transporte Pro <small style="font-size: 10px; color: #64748b;">v1.3.3</small></h1>
+        <h1>Transporte Pro <small style="font-size: 9px; opacity: 0.7;">Offline v1.3.4</small></h1>
     </header>
 
-    <div class="tabs">
+    <nav class="tabs">
         <button class="tab-btn active" id="btn-painel" onclick="showTab('painel')">PAGAMENTOS</button>
         <button class="tab-btn" id="btn-detalhes" onclick="showTab('detalhes')">ALUNOS</button>
         <button class="tab-btn" id="btn-cadastro" onclick="showTab('cadastro')">+ NOVO</button>
-    </div>
+    </nav>
 
     <section id="painel">
         <input type="text" id="buscaNome" placeholder="🔍 Buscar aluno..." onkeyup="renderPainel()">
@@ -126,14 +109,15 @@
             <select id="turno"><option value="Manhã">Manhã</option><option value="Tarde">Tarde</option><option value="Noite">Noite</option></select>
             <input type="number" step="0.01" id="valor" placeholder="Valor Mensalidade R$" required>
             <input type="number" id="vencimento" placeholder="Dia Vencimento (1-31)" required>
-            <input type="text" id="responsavel" placeholder="Nome do Responsável">
-            <input type="text" id="telefone" placeholder="Telefone com DDD" oninput="maskTel(this)">
+            <input type="text" id="responsavel" placeholder="Responsável">
+            <input type="text" id="telefone" placeholder="Telefone (DDD) 99999-9999" oninput="maskTel(this)">
             <button type="submit" class="btn btn-primary" style="padding:15px; font-size:14px">SALVAR DADOS</button>
         </form>
     </section>
 </div>
 
 <script>
+    // Armazenamento Local (Offline por padrão no navegador)
     let passageiros = JSON.parse(localStorage.getItem('van_dados_v1')) || [];
     const meses = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
@@ -160,9 +144,7 @@
         const mesAtualNome = meses[new Date().getMonth() - 1] || "Dez";
 
         hMeses.innerHTML = '<th>Passageiro</th>';
-        meses.forEach(m => {
-            hMeses.innerHTML += `<th style="${m === mesAtualNome ? 'background:var(--primary)' : ''}">${m}</th>`;
-        });
+        meses.forEach(m => { hMeses.innerHTML += `<th style="${m === mesAtualNome ? 'background:var(--primary)' : ''}">${m}</th>`; });
 
         corpo.innerHTML = '';
         let mRec = 0, mPend = 0;
@@ -198,41 +180,18 @@
 
     function enviarRecibo(id, mes) {
         const p = passageiros.find(x => x.id == id);
-        const dataEmissao = new Date().toLocaleDateString('pt-br');
-        
-        const texto = `*🧾 COMPROVANTE DE PAGAMENTO*%0A` +
-                      `------------------------------------------%0A` +
-                      `*REFERENTE:* Transporte Escolar%0A` +
-                      `*MES DE REF.:* ${mes.toUpperCase()}%0A%0A` +
-                      `*ALUNO(A):* ${p.nome.toUpperCase()}%0A` +
-                      `*RESPONSÁVEL:* ${p.responsavel || 'Não informado'}%0A` +
-                      `*VALOR:* R$ ${p.valor.toLocaleString('pt-br', {minimumFractionDigits:2})}%0A` +
-                      `*STATUS:* PAGO ✅%0A` +
-                      `------------------------------------------%0A` +
-                      `*DATA DE EMISSÃO:* ${dataEmissao}%0A%0A` +
-                      `_Este é um recibo digital. Obrigado pela confiança!_ 🚌`;
-
+        const texto = `*🧾 COMPROVANTE DE PAGAMENTO*%0A------------------------------------------%0A*ALUNO:* ${p.nome.toUpperCase()}%0A*MÊS:* ${mes.toUpperCase()}%0A*VALOR:* R$ ${p.valor.toLocaleString('pt-br', {minimumFractionDigits:2})}%0A*STATUS:* PAGO ✅%0A------------------------------------------%0A_Obrigado!_ 🚌`;
         window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${texto}`, '_blank');
     }
 
     document.getElementById('formCadastro').addEventListener('submit', (e) => {
         e.preventDefault();
         const id = document.getElementById('editId').value;
-        const p = {
-            id: id ? parseInt(id) : Date.now(),
-            nome: document.getElementById('nome').value,
-            turno: document.getElementById('turno').value,
-            valor: parseFloat(document.getElementById('valor').value),
-            vencimento: parseInt(document.getElementById('vencimento').value),
-            responsavel: document.getElementById('responsavel').value,
-            telefone: document.getElementById('telefone').value,
-            pagamentos: id ? passageiros.find(x => x.id == id).pagamentos : {}
-        };
+        const p = { id: id ? parseInt(id) : Date.now(), nome: document.getElementById('nome').value, turno: document.getElementById('turno').value, valor: parseFloat(document.getElementById('valor').value), vencimento: parseInt(document.getElementById('vencimento').value), responsavel: document.getElementById('responsavel').value, telefone: document.getElementById('telefone').value, pagamentos: id ? passageiros.find(x => x.id == id).pagamentos : {} };
         if(id) passageiros[passageiros.findIndex(x => x.id == id)] = p;
         else passageiros.push(p);
         localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
-        e.target.reset();
-        document.getElementById('editId').value = '';
+        e.target.reset(); document.getElementById('editId').value = '';
         showTab('painel');
     });
 
@@ -256,10 +215,23 @@
         showTab('cadastro');
     }
 
-    function excluir(id) { if(confirm("Deseja remover este aluno?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
+    function excluir(id) { if(confirm("Remover aluno?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
     function abrirZap(t) { window.open(`https://wa.me/55${t.replace(/\D/g,'')}`, '_blank'); }
     function exportarJSON() { const blob = new Blob([JSON.stringify(passageiros)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_transporte.json`; a.click(); }
-    function importarJSON(e) { const reader = new FileReader(); reader.onload = (ev) => { passageiros = JSON.parse(ev.target.result); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderPainel(); alert("Dados Importados!"); }; reader.readAsText(e.target.files[0]); }
+    function importarJSON(e) { const reader = new FileReader(); reader.onload = (ev) => { passageiros = JSON.parse(ev.target.result); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderPainel(); }; reader.readAsText(e.target.files[0]); }
+    
+    // REGISTRO DE SERVICE WORKER (PARA FUNCIONAR 100% OFFLINE)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('data:text/javascript;base64,' + btoa(`
+            self.addEventListener('install', (e) => {
+                e.waitUntil(caches.open('v1').then((cache) => cache.addAll(['/'])));
+            });
+            self.addEventListener('fetch', (e) => {
+                e.respondWith(caches.match(e.request).then((res) => res || fetch(e.request)));
+            });
+        `));
+    }
+
     window.onload = renderPainel;
 </script>
 </body>
