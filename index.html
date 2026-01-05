@@ -114,7 +114,7 @@
         .turno-noite { background: var(--noite); color: var(--noite-txt); }
 
         input, select, textarea { width: 100%; padding: 14px; margin-top: 5px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; background: white; }
-        textarea { height: 100px; font-family: monospace; font-size: 14px; resize: none; }
+        textarea { height: 100px; font-family: sans-serif; font-size: 14px; resize: none; }
         
         .btn { padding: 8px 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; text-align: center; }
         .btn-primary { background: var(--primary); color: white; width: 100%; }
@@ -135,12 +135,18 @@
         .gasto-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #e2e8f0; }
         .resumo-lucro { grid-column: span 2; background: #0f172a; border: 1px solid var(--primary); text-align: center; }
 
-        /* Estilos do Filtro */
-        .filtro-container { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        .filtro-container label { font-size: 12px; font-weight: bold; color: var(--primary); }
-        .filtro-container select { margin: 0; padding: 8px; font-size: 14px; flex: 1; }
-        
-        .config-label { font-size: 12px; font-weight: bold; color: var(--primary); display: block; margin-top: 10px; }
+        /* Estilos da Carteirinha Escola */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 15px; }
+        .carteirinha { width: 100%; max-width: 400px; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--primary); position: relative; }
+        .carteirinha-header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 14px; }
+        .carteirinha-corpo { padding: 15px; display: grid; grid-template-columns: 1fr 100px; gap: 10px; }
+        .carteirinha-info p { margin: 5px 0; font-size: 12px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
+        .carteirinha-info strong { color: var(--primary); font-size: 10px; text-transform: uppercase; display: block; }
+        .foto-aluno { width: 100px; height: 120px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #f8fafc; position: relative; }
+        .foto-aluno img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-foto { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer; }
+        .carteirinha-footer { padding: 15px; background: #f8fafc; display: flex; gap: 10px; }
+        .observacoes-box { grid-column: span 2; background: #fffde7; padding: 8px; border-radius: 6px; font-size: 11px; font-style: italic; border: 1px solid #fef08a; }
     </style>
 </head>
 <body>
@@ -184,20 +190,16 @@
             <input type="number" step="0.01" id="gastoValor" placeholder="Valor R$" required>
             <button type="submit" class="btn btn-primary" style="background:var(--danger); padding: 15px; font-size: 14px;">LANÇAR DESPESA AGORA</button>
         </form>
-        
         <hr>
-        
-        <div class="filtro-container">
-            <label>Filtrar Período:</label>
+        <div id="filtroContainer" class="container" style="background:#f1f5f9; margin-bottom:15px; padding:10px;">
+            <label style="font-size:12px; font-weight:bold;">Filtrar Período:</label>
             <select id="filtroMesFluxo" onchange="renderFluxo()"></select>
         </div>
-
         <div class="financeiro">
             <div class="fin-card"><h4>Recebido</h4><p id="fluxoRecebido" style="color:var(--success)">R$ 0,00</p></div>
             <div class="fin-card"><h4>Gastos</h4><p id="fluxoGastos" style="color:var(--danger)">R$ 0,00</p></div>
             <div class="fin-card resumo-lucro"><h4>Lucro Real do Período</h4><p id="fluxoLucro" style="font-size: 22px;">R$ 0,00</p></div>
         </div>
-        
         <div id="listaGastos" style="margin-top: 15px;"></div>
     </section>
 
@@ -205,7 +207,7 @@
         <input type="text" id="buscaAlunoTab" placeholder="🔍 Buscar aluno..." onkeyup="renderDetalhes()">
         <div class="table-container" style="min-width: 100%;">
             <table style="min-width: 100%;">
-                <thead><tr><th>Aluno / Escola / Turno</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Aluno / Escola</th><th>Ações</th></tr></thead>
                 <tbody id="corpoDetalhes"></tbody>
             </table>
         </div>
@@ -225,11 +227,17 @@
             <input type="number" step="0.01" id="valor" placeholder="Mensalidade R$" required>
             <input type="number" id="vencimento" placeholder="Dia Vencimento" required>
             <input type="text" id="telefone" placeholder="Telefone" oninput="maskTel(this)">
+            
+            <input type="text" id="endereco" placeholder="Endereço Completo">
+            <input type="text" id="bairro" placeholder="Bairro">
+            <textarea id="observacoes" placeholder="Observações (opcional)"></textarea>
+
             <div class="checkbox-container">
                 <input type="checkbox" id="enviarBoasVindas">
-                <label for="enviarBoasVindas">Enviar boas-vindas</label>
+                <label for="enviarBoasVindas">Enviar boas-vindas WhatsApp</label>
             </div>
-            <button type="submit" class="btn btn-primary" style="padding: 15px; font-size: 14px;">SALVAR ALUNO</button>
+            <button type="submit" class="btn btn-primary" style="padding: 15px; font-size: 14px;">SALVAR CADASTRO</button>
+            <button type="button" class="btn" style="width:100%; margin-top:10px; background:#94a3b8; color:white;" onclick="showTab('painel')">CANCELAR</button>
         </form>
     </section>
 
@@ -237,13 +245,10 @@
         <h3>Configurações de Mensagens</h3>
         <label class="config-label">Recibo (Confirmação)</label>
         <textarea id="msgRecibo"></textarea>
-        
         <label class="config-label">Cobrança (Aviso)</label>
         <textarea id="msgCobranca"></textarea>
-        
         <label class="config-label">Boas-Vindas (Novo Aluno)</label>
         <textarea id="msgBoasVindas"></textarea>
-        
         <button class="btn btn-primary" onclick="salvarConfig()" style="padding: 15px; font-size: 14px;">SALVAR CONFIGURAÇÕES</button>
         <hr>
         <div style="display:flex; gap:8px;">
@@ -254,18 +259,36 @@
     </section>
 </div>
 
+<div id="modalFicha" class="modal-overlay hidden">
+    <div class="carteirinha">
+        <div class="carteirinha-header">Ficha Individual do Aluno</div>
+        <div class="carteirinha-corpo">
+            <div class="carteirinha-info" id="infoFicha"></div>
+            <div class="foto-aluno">
+                <img id="imgFicha" src="" class="hidden">
+                <span id="fotoPlaceholder" style="font-size:10px; color:#94a3b8; text-align:center;">SEM FOTO</span>
+                <input type="file" id="inputFoto" accept="image/*" capture="camera" style="display:none" onchange="processarFoto(event)">
+                <button class="btn-foto" onclick="document.getElementById('inputFoto').click()">FOTO/CÂMERA</button>
+            </div>
+            <div class="observacoes-box" id="obsFicha"></div>
+        </div>
+        <div class="carteirinha-footer">
+            <button class="btn btn-primary" id="btnEditarFicha">EDITAR DADOS</button>
+            <button class="btn" style="background:#64748b; color:white; flex:1;" onclick="fecharFicha()">FECHAR</button>
+        </div>
+    </div>
+</div>
+
 <script>
     let passageiros = JSON.parse(localStorage.getItem('van_dados_v1')) || [];
     let gastos = JSON.parse(localStorage.getItem('van_gastos_v1')) || [];
     const meses = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     
-    // MENSAGENS PROFISSIONAIS PADRÃO
     let configMsg = localStorage.getItem('van_msg_recibo') || "✅ *RECIBO DE PAGAMENTO*\n\nOlá! Confirmamos o recebimento da mensalidade de *{nome}* referente ao mês de *{mes}*.\n\n💰 *Valor:* R$ {valor}\n🙏 Obrigado pela confiança!";
     let configCobranca = localStorage.getItem('van_msg_cobranca') || "⚠️ *AVISO DE VENCIMENTO*\n\nOlá! Notamos que a mensalidade de *{nome}* ({mes}) ainda não foi identificada no sistema.\n\n💵 *Valor:* R$ {valor}\n\nCaso já tenha realizado o pagamento, favor desconsiderar ou enviar o comprovante. Obrigado!";
     let configBoasVindas = localStorage.getItem('van_msg_boasvindas') || "🚐 *BEM-VINDO(A) AO TRANSPORTE PRO!*\n\nOlá, o cadastro de *{nome}* foi concluído com sucesso.\n\n📌 *Detalhes:*\n- Vencimento: Todo dia {vencimento}\n- Mensalidade: R$ {valor}\n\nEstamos à disposição para qualquer dúvida!";
 
-    const hojeGlobal = new Date();
-    const anoAtualGlobal = hojeGlobal.getFullYear();
+    let idAlunoAtivo = null;
 
     function showTab(tabId) {
         document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
@@ -315,11 +338,9 @@
             meses.forEach((m) => {
                 const chaveAno = `${m}_${anoAtual}`;
                 const isPago = p.pagamentos && p.pagamentos[chaveAno];
-                
                 const diaVenc = parseInt(p.vencimento);
                 const valorNum = parseFloat(p.valor) || 0;
                 const isMesCol = (m.toLowerCase() === mesParaSoma.toLowerCase());
-
                 let deveCobrar = false;
                 const idxCol = meses.indexOf(m);
                 const idxAtu = meses.indexOf(mesParaSoma);
@@ -328,11 +349,9 @@
                     if (idxCol < idxAtu) deveCobrar = true;
                     else if (isMesCol && diaHoje >= diaVenc) deveCobrar = true;
                 }
-
                 if(isMesCol && mesAtualReal > 0) { 
                     if(isPago) totalRec += valorNum; else totalPend += valorNum; 
                 }
-
                 rowHtml += `<td><span class="status-badge ${isPago ? 'status-pago' : 'status-aberto'}">${isPago ? 'PAGO' : 'ABERTO'}</span><button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1" onclick="togglePagamento(${p.id}, '${m}', ${anoAtual})">Alt</button>${isPago ? `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : (deveCobrar ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')}</td>`;
             });
             const tr = document.createElement('tr'); tr.innerHTML = rowHtml; corpo.appendChild(tr);
@@ -346,6 +365,48 @@
         atualizarContador();
     }
 
+    function abrirFicha(id) {
+        idAlunoAtivo = id;
+        const p = passageiros.find(x => x.id == id);
+        const info = document.getElementById('infoFicha');
+        const obs = document.getElementById('obsFicha');
+        info.innerHTML = `
+            <p><strong>Nome Completo</strong>${p.nome}</p>
+            <p><strong>Responsável</strong>${p.responsavel || '-'}</p>
+            <p><strong>Escola / Turno</strong>${p.escola} (${p.turno})</p>
+            <p><strong>Telefone</strong>${p.telefone}</p>
+            <p><strong>Endereço</strong>${p.endereco || 'Não informado'}</p>
+            <p><strong>Bairro</strong>${p.bairro || 'Não informado'}</p>
+            <p><strong>Mensalidade</strong>R$ ${parseFloat(p.valor).toFixed(2)} (Dia ${p.vencimento})</p>
+        `;
+        obs.innerText = p.observacoes ? `Observações: ${p.observacoes}` : "Sem observações adicionais.";
+        const img = document.getElementById('imgFicha');
+        const placeholder = document.getElementById('fotoPlaceholder');
+        if(p.foto) { img.src = p.foto; img.classList.remove('hidden'); placeholder.classList.add('hidden'); }
+        else { img.classList.add('hidden'); placeholder.classList.remove('hidden'); }
+        document.getElementById('btnEditarFicha').onclick = () => { fecharFicha(); editar(p.id); };
+        document.getElementById('modalFicha').classList.remove('hidden');
+    }
+
+    function fecharFicha() { document.getElementById('modalFicha').classList.add('hidden'); idAlunoAtivo = null; }
+
+    function processarFoto(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                const pIndex = passageiros.findIndex(x => x.id == idAlunoAtivo);
+                passageiros[pIndex].foto = base64;
+                localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
+                document.getElementById('imgFicha').src = base64;
+                document.getElementById('imgFicha').classList.remove('hidden');
+                document.getElementById('fotoPlaceholder').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
     function togglePagamento(id, mes, ano) {
         const p = passageiros.find(x => x.id == id);
         if(!p.pagamentos) p.pagamentos = {};
@@ -355,118 +416,14 @@
         renderPainel();
     }
 
-    function preencherFiltroMes() {
-        const seletor = document.getElementById('filtroMesFluxo');
-        if(seletor.options.length > 0) return;
-
-        const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-        const anoAtual = new Date().getFullYear();
-        
-        [anoAtual - 1, anoAtual].forEach(ano => {
-            nomesMeses.forEach((nome, index) => {
-                const option = document.createElement('option');
-                option.value = `${index}-${ano}`;
-                option.text = `${nome} / ${ano}`;
-                if(ano === anoAtual && index === new Date().getMonth()) option.selected = true;
-                seletor.appendChild(option);
-            });
-        });
-    }
-
-    document.getElementById('formGasto').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const agora = new Date();
-        const dataSistema = agora.toISOString().split('T')[0];
-
-        const novoGasto = {
-            id: Date.now(),
-            desc: document.getElementById('gastoDesc').value,
-            valor: parseFloat(document.getElementById('gastoValor').value),
-            data: dataSistema 
-        };
-        
-        gastos.push(novoGasto);
-        localStorage.setItem('van_gastos_v1', JSON.stringify(gastos));
-        e.target.reset();
-        renderFluxo();
-    });
-
-    function renderFluxo() {
-        const lista = document.getElementById('listaGastos');
-        const filtro = document.getElementById('filtroMesFluxo').value.split('-');
-        const mesAlvo = parseInt(filtro[0]);
-        const anoAlvo = parseInt(filtro[1]);
-
-        const nomesAbrev = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-        const mesChave = nomesAbrev[mesAlvo];
-        
-        let totalRecebido = 0;
-        passageiros.forEach(p => {
-            const chave = `${mesChave}_${anoAlvo}`;
-            if(p.pagamentos && p.pagamentos[chave]) totalRecebido += parseFloat(p.valor || 0);
-        });
-
-        let totalGastos = 0;
-        lista.innerHTML = `<h4>Histórico de Gastos - ${mesChave}/${anoAlvo}</h4>`;
-        
-        gastos.filter(g => {
-            const d = new Date(g.data + 'T00:00:00');
-            return d.getMonth() === mesAlvo && d.getFullYear() === anoAlvo;
-        }).forEach(g => {
-            totalGastos += g.valor;
-            const [ano, mes, dia] = g.data.split('-');
-            const dataFormatada = `${dia}/${mes}/${ano}`;
-            
-            lista.innerHTML += `<div class="gasto-item">
-                <span><strong>${g.desc}</strong><br><small>${dataFormatada}</small></span>
-                <span>R$ ${g.valor.toLocaleString('pt-br',{minimumFractionDigits:2})} <button onclick="removerGasto(${g.id})" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold; padding: 5px;">X</button></span>
-            </div>`;
-        });
-
-        document.getElementById('fluxoRecebido').innerText = `R$ ${totalRecebido.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
-        document.getElementById('fluxoGastos').innerText = `R$ ${totalGastos.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
-        const lucro = totalRecebido - totalGastos;
-        document.getElementById('fluxoLucro').innerText = `R$ ${lucro.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
-        document.getElementById('fluxoLucro').style.color = lucro >= 0 ? 'var(--success)' : 'var(--danger)';
-    }
-
-    function removerGasto(id) {
-        if(confirm("Excluir este gasto?")) {
-            gastos = gastos.filter(g => g.id !== id);
-            localStorage.setItem('van_gastos_v1', JSON.stringify(gastos));
-            renderFluxo();
-        }
-    }
-
-    function maskTel(i) {
-        let v = i.value.replace(/\D/g, "");
-        v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
-        v = v.replace(/(\d)(\d{4})$/, "$1-$2");
-        i.value = v;
-    }
-    function getTurnoClass(t) { return t === 'Manhã' ? 'turno-manha' : t === 'Tarde' ? 'turno-tarde' : 'turno-noite'; }
-    function atualizarContador() { document.getElementById('totalPassageiros').innerText = `Total: ${passageiros.length} passageiros`; }
-    function abrirZap(t) { window.open(`https://wa.me/55${t.replace(/\D/g,'')}`, '_blank'); }
-    
-    function enviarRecibo(id, mes) {
-        const p = passageiros.find(x => x.id == id);
-        const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
-        let t = configMsg.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
-        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
-    }
-    
-    function enviarCobranca(id, mes) {
-        const p = passageiros.find(x => x.id == id);
-        const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
-        let t = configCobranca.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
-        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
-    }
-
     document.getElementById('formCadastro').addEventListener('submit', (e) => {
         e.preventDefault();
         const id = document.getElementById('editId').value;
+        const idNum = id ? parseInt(id) : Date.now();
+        const pExistente = id ? passageiros.find(x => x.id == id) : null;
+
         const p = { 
-            id: id ? parseInt(id) : Date.now(), 
+            id: idNum, 
             nome: document.getElementById('nome').value, 
             responsavel: document.getElementById('responsavel').value,
             escola: document.getElementById('escola').value,
@@ -474,12 +431,15 @@
             valor: parseFloat(document.getElementById('valor').value), 
             vencimento: parseInt(document.getElementById('vencimento').value), 
             telefone: document.getElementById('telefone').value, 
-            pagamentos: id ? (passageiros.find(x => x.id == id).pagamentos || {}) : {} 
+            endereco: document.getElementById('endereco').value,
+            bairro: document.getElementById('bairro').value,
+            observacoes: document.getElementById('observacoes').value,
+            foto: pExistente ? pExistente.foto : null,
+            pagamentos: pExistente ? (pExistente.pagamentos || {}) : {} 
         };
 
         if(id) passageiros[passageiros.findIndex(x => x.id == id)] = p;
         else passageiros.push(p);
-        
         localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
 
         if(document.getElementById('enviarBoasVindas').checked) {
@@ -487,9 +447,8 @@
             let t = configBoasVindas.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{vencimento}/g, p.vencimento).replace(/{valor}/g, v);
             window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
         }
-
         e.target.reset(); document.getElementById('editId').value = '';
-        showTab('painel');
+        showTab('detalhes');
     });
 
     function renderDetalhes() {
@@ -498,7 +457,10 @@
         corpo.innerHTML = '';
         passageiros.forEach(p => {
             if(busca && !p.nome.toLowerCase().includes(busca)) return;
-            corpo.innerHTML += `<tr><td><strong>${p.nome}</strong><br><small>${p.escola}</small></td><td><button class="btn" style="background:#e2e8f0" onclick="editar(${p.id})">✏️</button> <button class="btn" style="background:var(--danger);color:white" onclick="excluir(${p.id})">🗑️</button></td></tr>`;
+            corpo.innerHTML += `<tr><td><strong>${p.nome}</strong><br><small>${p.escola} (${p.turno})</small></td><td>
+                <button class="btn" style="background:var(--primary); color:white" onclick="abrirFicha(${p.id})">FICHA</button> 
+                <button class="btn" style="background:var(--danger);color:white" onclick="excluir(${p.id})">🗑️</button>
+            </td></tr>`;
         });
     }
 
@@ -512,11 +474,75 @@
         document.getElementById('valor').value = p.valor;
         document.getElementById('vencimento').value = p.vencimento;
         document.getElementById('telefone').value = p.telefone;
+        document.getElementById('endereco').value = p.endereco || '';
+        document.getElementById('bairro').value = p.bairro || '';
+        document.getElementById('observacoes').value = p.observacoes || '';
         showTab('cadastro');
     }
 
-    function excluir(id) { if(confirm("Excluir?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
+    function preencherFiltroMes() {
+        const seletor = document.getElementById('filtroMesFluxo');
+        if(seletor.options.length > 0) return;
+        const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const anoAt = new Date().getFullYear();
+        [anoAt - 1, anoAt].forEach(ano => {
+            nomesMeses.forEach((nome, index) => {
+                const opt = document.createElement('option');
+                opt.value = `${index}-${ano}`; opt.text = `${nome} / ${ano}`;
+                if(ano === anoAt && index === new Date().getMonth()) opt.selected = true;
+                seletor.appendChild(opt);
+            });
+        });
+    }
 
+    document.getElementById('formGasto').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const novoGasto = { id: Date.now(), desc: document.getElementById('gastoDesc').value, valor: parseFloat(document.getElementById('gastoValor').value), data: new Date().toISOString().split('T')[0] };
+        gastos.push(novoGasto);
+        localStorage.setItem('van_gastos_v1', JSON.stringify(gastos));
+        e.target.reset(); renderFluxo();
+    });
+
+    function renderFluxo() {
+        const lista = document.getElementById('listaGastos');
+        const filtro = document.getElementById('filtroMesFluxo').value.split('-');
+        const mesAlvo = parseInt(filtro[0]); const anoAlvo = parseInt(filtro[1]);
+        const nomesAbrev = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+        const mesChave = nomesAbrev[mesAlvo];
+        let totalRecebido = 0;
+        passageiros.forEach(p => { const chave = `${mesChave}_${anoAlvo}`; if(p.pagamentos && p.pagamentos[chave]) totalRecebido += parseFloat(p.valor || 0); });
+        let totalGastos = 0;
+        lista.innerHTML = `<h4 style="font-size:14px; border-bottom:1px solid #ddd; padding-bottom:5px;">Gastos em ${mesChave}/${anoAlvo}</h4>`;
+        gastos.filter(g => { const d = new Date(g.data + 'T00:00:00'); return d.getMonth() === mesAlvo && d.getFullYear() === anoAlvo; }).forEach(g => {
+            totalGastos += g.valor;
+            lista.innerHTML += `<div class="gasto-item"><span><strong>${g.desc}</strong></span><span>R$ ${g.valor.toLocaleString('pt-br',{minimumFractionDigits:2})} <button onclick="removerGasto(${g.id})" style="color:red; border:none; background:none; font-weight:bold; cursor:pointer;">X</button></span></div>`;
+        });
+        document.getElementById('fluxoRecebido').innerText = `R$ ${totalRecebido.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
+        document.getElementById('fluxoGastos').innerText = `R$ ${totalGastos.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
+        const lucro = totalRecebido - totalGastos;
+        document.getElementById('fluxoLucro').innerText = `R$ ${lucro.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
+        document.getElementById('fluxoLucro').style.color = lucro >= 0 ? 'var(--success)' : 'var(--danger)';
+    }
+
+    function removerGasto(id) { if(confirm("Excluir este gasto?")) { gastos = gastos.filter(g => g.id !== id); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); renderFluxo(); } }
+    function maskTel(i) { let v = i.value.replace(/\D/g, ""); v = v.replace(/^(\d{2})(\d)/g, "($1) $2"); v = v.replace(/(\d)(\d{4})$/, "$1-$2"); i.value = v; }
+    function getTurnoClass(t) { return t === 'Manhã' ? 'turno-manha' : t === 'Tarde' ? 'turno-tarde' : 'turno-noite'; }
+    function atualizarContador() { document.getElementById('totalPassageiros').innerText = `Total: ${passageiros.length} passageiros`; }
+    function abrirZap(t) { window.open(`https://wa.me/55${t.replace(/\D/g,'')}`, '_blank'); }
+    function enviarRecibo(id, mes) {
+        const p = passageiros.find(x => x.id == id);
+        const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
+        let t = configMsg.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
+        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
+    }
+    function enviarCobranca(id, mes) {
+        const p = passageiros.find(x => x.id == id);
+        const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
+        let t = configCobranca.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
+        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
+    }
+    function excluir(id) { if(confirm("Excluir cadastro permanentemente?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
+    
     function salvarConfig() {
         configMsg = document.getElementById('msgRecibo').value;
         configCobranca = document.getElementById('msgCobranca').value;
@@ -524,25 +550,20 @@
         localStorage.setItem('van_msg_recibo', configMsg);
         localStorage.setItem('van_msg_cobranca', configCobranca);
         localStorage.setItem('van_msg_boasvindas', configBoasVindas);
-        alert("Configurações salvas com sucesso!");
+        alert("Configurações salvas!");
     }
 
-    // BACKUP E IMPORTAÇÃO ATUALIZADOS COM FLUXO E CONFIGS
     function exportarJSON() { 
-        const dadosCompletos = {
+        const dados = {
             passageiros: passageiros,
             gastos: gastos,
-            config: {
-                recibo: configMsg,
-                cobranca: configCobranca,
-                boasVindas: configBoasVindas
-            }
+            config: { recibo: configMsg, cobranca: configCobranca, boasVindas: configBoasVindas },
+            versao: "1.2",
+            data: new Date().toISOString()
         };
-        const blob = new Blob([JSON.stringify(dadosCompletos)], {type: 'application/json'}); 
-        const a = document.createElement('a'); 
-        a.href = URL.createObjectURL(blob); 
-        a.download = `backup_transporte_pro_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; 
-        a.click(); 
+        const blob = new Blob([JSON.stringify(dados)], {type: 'application/json'}); 
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_van_pro_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click(); 
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     }
 
     function importarJSON(e) { 
@@ -550,29 +571,17 @@
         reader.onload = (ev) => { 
             try {
                 const d = JSON.parse(ev.target.result); 
-                
-                // Suporte para backup novo (objeto) ou antigo (array direto)
-                passageiros = d.passageiros || d.p || []; 
-                gastos = d.gastos || d.g || []; 
-
+                passageiros = (d.passageiros || d.p || []).map(p => ({
+                    ...p, endereco: p.endereco || "", bairro: p.bairro || "", observacoes: p.observacoes || "", foto: p.foto || null
+                })); 
+                gastos = d.gastos || d.g || [];
                 if(d.config) {
-                    configMsg = d.config.recibo || configMsg;
-                    configCobranca = d.config.cobranca || configCobranca;
-                    configBoasVindas = d.config.boasVindas || configBoasVindas;
-                    
-                    localStorage.setItem('van_msg_recibo', configMsg);
-                    localStorage.setItem('van_msg_cobranca', configCobranca);
-                    localStorage.setItem('van_msg_boasvindas', configBoasVindas);
+                    configMsg = d.config.recibo || configMsg; configCobranca = d.config.cobranca || configCobranca; configBoasVindas = d.config.boasVindas || configBoasVindas;
+                    localStorage.setItem('van_msg_recibo', configMsg); localStorage.setItem('van_msg_cobranca', configCobranca); localStorage.setItem('van_msg_boasvindas', configBoasVindas);
                 }
-
-                localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); 
-                localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); 
-                
-                alert("Dados importados com sucesso!");
-                location.reload(); 
-            } catch (err) {
-                alert("Erro ao importar arquivo. Verifique se o formato é válido.");
-            }
+                localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); 
+                alert("Backup restaurado com sucesso!"); location.reload(); 
+            } catch (err) { alert("Erro ao importar arquivo!"); }
         }; 
         reader.readAsText(e.target.files[0]); 
     }
