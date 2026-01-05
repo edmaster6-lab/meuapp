@@ -2,11 +2,18 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Transporte Pro">
+    
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+    
     <title>Transporte Pro</title>
     
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-web-app-capable" content="yes">
     <meta name="theme-color" content="#2563eb">
     
     <style>
@@ -27,36 +34,44 @@
         }
 
         * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: calc(env(safe-area-inset-top) + 10px) 10px 10px 10px; 
+            overflow-x: hidden; 
+        }
 
         .container { max-width: 100%; background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         
+        /* Cabeçalho Centralizado e Profissional */
         .header-main { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
-            gap: 5px; 
             margin-bottom: 20px; 
             padding: 10px 0;
         }
-        .header-main span { font-size: 40px; }
+
         .header-main h1 { 
-            font-size: 26px; 
+            font-size: 28px; 
             margin: 0; 
             color: var(--primary); 
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+        
         .header-main .counter {
             font-size: 14px;
             color: #64748b;
             font-weight: bold;
             background: #f1f5f9;
-            padding: 2px 10px;
+            padding: 4px 15px;
             border-radius: 20px;
-            margin-top: 5px;
+            margin-top: 8px;
         }
 
         .tabs { display: flex; gap: 4px; margin-bottom: 15px; position: sticky; top: 0; background: white; z-index: 10; padding: 5px 0; overflow-x: auto; }
@@ -119,7 +134,6 @@
 
 <div class="container">
     <header class="header-main">
-        <span>🚌</span>
         <h1>Transporte Pro</h1>
         <div id="totalPassageiros" class="counter">Total: 0 passageiros</div>
     </header>
@@ -178,10 +192,10 @@
     </section>
 
     <section id="config" class="hidden">
-        <h3>Mensagens Personalizadas</h3>
-        <label class="config-label">Recibo (Pago)</label><textarea id="msgRecibo"></textarea>
-        <label class="config-label">Cobrança (Pendente)</label><textarea id="msgCobranca"></textarea>
-        <label class="config-label">Boas-Vindas</label><textarea id="msgBoasVindas"></textarea>
+        <h3>Configurações</h3>
+        <label class="config-label">Mensagem de Recibo</label><textarea id="msgRecibo"></textarea>
+        <label class="config-label">Mensagem de Cobrança</label><textarea id="msgCobranca"></textarea>
+        <label class="config-label">Mensagem de Boas-Vindas</label><textarea id="msgBoasVindas"></textarea>
         <button class="btn btn-primary" onclick="salvarConfig()" style="padding:15px; margin-bottom: 20px;">SALVAR CONFIGURAÇÕES</button>
         <hr>
         <div style="display:flex; gap:8px;">
@@ -196,9 +210,9 @@
     let passageiros = JSON.parse(localStorage.getItem('van_dados_v1')) || [];
     const meses = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     
-    const msgPadraoRecibo = "*CONFIRMAÇÃO DE PAGAMENTO*\n\nOlá, informamos que o seu pagamento foi processado com sucesso.\n\n- *Passageiro:* {nome}\n- *Mês:* {mes}\n- *Valor:* R$ {valor}\n- *Status:* PAGO ✅";
-    const msgPadraoCobranca = "*AVISO DE VENCIMENTO*\n\nOlá, notamos que o pagamento de {nome} referente ao mês de {mes} ainda não consta em nosso sistema.\n\n- *Valor:* R$ {valor}\n\nCaso já tenha efetuado, envie o comprovante.";
-    const msgPadraoBoasVindas = "*BOAS-VINDAS!*\n\nOlá {nome}, é um prazer ter você conosco no Transporte Pro 🚌.\n\nSeu cadastro foi realizado com sucesso!\n- *Vencimento:* Dia {vencimento}\n- *Valor:* R$ {valor}";
+    const msgPadraoRecibo = "*CONFIRMAÇÃO DE PAGAMENTO*\n\nOlá, seu pagamento foi processado.\n- *Passageiro:* {nome}\n- *Mês:* {mes}\n- *Valor:* R$ {valor}\n- *Status:* PAGO ✅";
+    const msgPadraoCobranca = "*AVISO DE VENCIMENTO*\n\nOlá, o pagamento de {nome} ({mes}) ainda não consta no sistema.\n- *Valor:* R$ {valor}";
+    const msgPadraoBoasVindas = "*BOAS-VINDAS!*\n\nOlá {nome}, cadastro realizado com sucesso!\n- *Vencimento:* Dia {vencimento}\n- *Valor:* R$ {valor}";
 
     let configMsg = localStorage.getItem('van_msg_recibo') || msgPadraoRecibo;
     let configCobranca = localStorage.getItem('van_msg_cobranca') || msgPadraoCobranca;
@@ -358,7 +372,6 @@
         corpo.innerHTML = '';
         passageiros.forEach(p => {
             if(busca && !p.nome.toLowerCase().includes(busca) && !p.escola?.toLowerCase().includes(busca)) return;
-            
             corpo.innerHTML += `<tr>
                 <td>
                     <strong class="nome-destaque">${p.nome}</strong>
