@@ -17,7 +17,6 @@
             --danger: #ef4444;
             --bg: #f1f5f9;
             --text: #1e293b;
-            /* Cores dos Turnos */
             --manha: #dbeafe;
             --manha-txt: #1e40af;
             --tarde: #ffedd5;
@@ -41,20 +40,24 @@
         table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         th { background: #1e293b; color: white; padding: 12px; font-size: 11px; text-align: center; }
         
-        th:first-child { position: sticky; left: 0; z-index: 3; background: #1e293b; text-align: left; min-width: 180px; }
+        th:first-child { position: sticky; left: 0; z-index: 3; background: #1e293b; text-align: left; min-width: 200px; }
+        
+        /* Ajuste de tamanho na primeira coluna (Nomes e Responsáveis) */
         td:first-child { 
             position: sticky; left: 0; z-index: 2; background: white; text-align: left; 
-            font-weight: bold; border-right: 2px solid #f1f5f9; font-size: 15px; line-height: 1.2;
+            font-weight: bold; border-right: 2px solid #f1f5f9; 
+            font-size: 17px; /* Nome do aluno maior */
+            line-height: 1.3;
+            padding: 12px 8px;
         }
         
         td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 12px; text-align: center; }
 
-        /* Estilos dos Crachás */
         .status-badge { padding: 4px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; display: block; margin-bottom: 4px; }
         .status-pago { background: #dcfce7; color: #166534; }
         .status-aberto { background: #fef9c3; color: #854d0e; }
 
-        .badge-turno { padding: 2px 5px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; display: inline-block; margin-top: 2px; }
+        .badge-turno { padding: 2px 5px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: inline-block; margin-top: 4px; }
         .turno-manha { background: var(--manha); color: var(--manha-txt); }
         .turno-tarde { background: var(--tarde); color: var(--tarde-txt); }
         .turno-noite { background: var(--noite); color: var(--noite-txt); }
@@ -66,7 +69,7 @@
         .btn-primary { background: var(--primary); color: white; width: 100%; }
         .btn-recibo { background: #6366f1; color: white; margin-top: 4px; width: 100%; display: block; }
         .btn-cobranca { background: var(--danger); color: white; margin-top: 4px; width: 100%; display: block; }
-        .btn-ws { background: #25d366; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; margin-left: 5px; font-size: 14px; }
+        .btn-ws { background: #25d366; color: white; border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; margin-left: 5px; font-size: 16px; }
 
         .financeiro { margin-top: 15px; padding: 12px; background: #1e293b; border-radius: 10px; color: white; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .fin-card h4 { margin: 0; font-size: 9px; color: #94a3b8; text-transform: uppercase; }
@@ -74,11 +77,13 @@
 
         .config-label { font-weight: bold; font-size: 13px; display: block; margin-top: 10px; color: var(--primary); }
         .hidden { display: none !important; }
-        .info-sub { font-size: 10px; color: #64748b; font-weight: normal; display: block; }
+        
+        /* Estilo para o nome do Responsável na tela de pagamentos */
+        .info-sub { font-size: 13px; color: #475569; font-weight: 500; display: block; margin-top: 2px; }
         
         .checkbox-container { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
         .checkbox-container input { width: auto; margin: 0; }
-        .nome-destaque { font-size: 16px; display: block; margin-bottom: 2px; }
+        .nome-destaque { font-size: 18px; display: block; margin-bottom: 2px; }
     </style>
 </head>
 <body>
@@ -97,7 +102,7 @@
     </nav>
 
     <section id="painel">
-        <input type="text" id="buscaNome" placeholder="🔍 Buscar aluno ou escola..." onkeyup="renderPainel()">
+        <input type="text" id="buscaNome" placeholder="🔍 Buscar aluno, escola ou responsável..." onkeyup="renderPainel()">
         <div class="table-container">
             <table>
                 <thead><tr id="headerMeses"></tr></thead>
@@ -227,13 +232,13 @@
         let mRec = 0, mPend = 0;
 
         passageiros.forEach(p => {
-            if(busca && !p.nome.toLowerCase().includes(busca) && !p.escola?.toLowerCase().includes(busca)) return;
+            if(busca && !p.nome.toLowerCase().includes(busca) && !p.escola?.toLowerCase().includes(busca) && !p.responsavel?.toLowerCase().includes(busca)) return;
             
             let rowHtml = `<td>
-                ${p.nome}
-                <span class="badge-turno ${getTurnoClass(p.turno)}">${p.turno}</span>
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-top:4px;">
-                    <span class="info-sub">Resp: ${p.responsavel || '---'}</span>
+                <div>${p.nome}</div>
+                <div class="info-sub">Resp: ${p.responsavel || '---'}</div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top:6px;">
+                    <span class="badge-turno ${getTurnoClass(p.turno)}">${p.turno}</span>
                     <a class="btn-ws" onclick="abrirZap('${p.telefone}')">💬</a>
                 </div>
             </td>`;
