@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
@@ -10,6 +9,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Transporte Pro">
     
+    <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
     
@@ -46,7 +46,6 @@
 
         .container { max-width: 100%; background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         
-        /* Cabeçalho Centralizado e Profissional */
         .header-main { 
             display: flex; 
             flex-direction: column; 
@@ -296,15 +295,20 @@
 
             meses.forEach(m => {
                 const isPago = p.pagamentos && p.pagamentos[m];
-                const vencido = diaAtual >= parseInt(p.vencimento);
+                const vencimentoDia = parseInt(p.vencimento);
+                
+                // Lógica Corrigida: Vencido apenas se NÃO está pago E o dia atual >= dia do vencimento
+                const estaVencido = !isPago && (diaAtual >= vencimentoDia);
+
                 if(m === mesAtualNome) { 
                     const valorNum = parseFloat(p.valor) || 0;
                     if(isPago) mRec += valorNum; else mPend += valorNum; 
                 }
+
                 rowHtml += `<td>
                     <span class="status-badge ${isPago ? 'status-pago' : 'status-aberto'}">${isPago ? 'PAGO' : 'ABERTO'}</span>
                     <button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1" onclick="togglePagamento(${p.id}, '${m}')">Alt</button>
-                    ${isPago ? `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : (vencido ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')}
+                    ${isPago ? `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : (estaVencido ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')}
                 </td>`;
             });
             const tr = document.createElement('tr');
