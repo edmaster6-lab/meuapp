@@ -135,16 +135,19 @@
         .gasto-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #e2e8f0; }
         .resumo-lucro { grid-column: span 2; background: #0f172a; border: 1px solid var(--primary); text-align: center; }
 
-        /* Estilos da Carteirinha Escola */
+        /* Estilos da Carteirinha Escola - Versão 1.1 */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 15px; }
-        .carteirinha { width: 100%; max-width: 400px; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--primary); position: relative; }
+        .carteirinha { width: 100%; max-width: 420px; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--primary); position: relative; }
         .carteirinha-header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 14px; }
-        .carteirinha-corpo { padding: 15px; display: grid; grid-template-columns: 1fr 100px; gap: 10px; }
+        .carteirinha-corpo { padding: 15px; display: grid; grid-template-columns: 1fr 130px; gap: 10px; }
         .carteirinha-info p { margin: 5px 0; font-size: 12px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
         .carteirinha-info strong { color: var(--primary); font-size: 10px; text-transform: uppercase; display: block; }
-        .foto-aluno { width: 100px; height: 120px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #f8fafc; position: relative; }
+        
+        .foto-aluno { width: 130px; height: 160px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #f8fafc; position: relative; }
         .foto-aluno img { width: 100%; height: 100%; object-fit: cover; }
         .btn-foto { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer; }
+        .btn-apagar-foto { position: absolute; top: 5px; right: 5px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 10; font-size: 12px; }
+        
         .carteirinha-footer { padding: 15px; background: #f8fafc; display: flex; gap: 10px; }
         .observacoes-box { grid-column: span 2; background: #fffde7; padding: 8px; border-radius: 6px; font-size: 11px; font-style: italic; border: 1px solid #fef08a; }
     </style>
@@ -265,6 +268,7 @@
         <div class="carteirinha-corpo">
             <div class="carteirinha-info" id="infoFicha"></div>
             <div class="foto-aluno">
+                <button id="btnRemoverFoto" class="btn-apagar-foto hidden" onclick="removerFoto()">X</button>
                 <img id="imgFicha" src="" class="hidden">
                 <span id="fotoPlaceholder" style="font-size:10px; color:#94a3b8; text-align:center;">SEM FOTO</span>
                 <input type="file" id="inputFoto" accept="image/*" capture="camera" style="display:none" onchange="processarFoto(event)">
@@ -380,12 +384,36 @@
             <p><strong>Mensalidade</strong>R$ ${parseFloat(p.valor).toFixed(2)} (Dia ${p.vencimento})</p>
         `;
         obs.innerText = p.observacoes ? `Observações: ${p.observacoes}` : "Sem observações adicionais.";
+        
         const img = document.getElementById('imgFicha');
         const placeholder = document.getElementById('fotoPlaceholder');
-        if(p.foto) { img.src = p.foto; img.classList.remove('hidden'); placeholder.classList.add('hidden'); }
-        else { img.classList.add('hidden'); placeholder.classList.remove('hidden'); }
+        const btnRemover = document.getElementById('btnRemoverFoto');
+
+        if(p.foto) { 
+            img.src = p.foto; 
+            img.classList.remove('hidden'); 
+            placeholder.classList.add('hidden'); 
+            btnRemover.classList.remove('hidden');
+        } else { 
+            img.classList.add('hidden'); 
+            placeholder.classList.remove('hidden'); 
+            btnRemover.classList.add('hidden');
+        }
+
         document.getElementById('btnEditarFicha').onclick = () => { fecharFicha(); editar(p.id); };
         document.getElementById('modalFicha').classList.remove('hidden');
+    }
+
+    function removerFoto() {
+        if(confirm("Deseja apagar a foto deste aluno?")) {
+            const pIndex = passageiros.findIndex(x => x.id == idAlunoAtivo);
+            passageiros[pIndex].foto = null;
+            localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
+            
+            document.getElementById('imgFicha').classList.add('hidden');
+            document.getElementById('fotoPlaceholder').classList.remove('hidden');
+            document.getElementById('btnRemoverFoto').classList.add('hidden');
+        }
     }
 
     function fecharFicha() { document.getElementById('modalFicha').classList.add('hidden'); idAlunoAtivo = null; }
@@ -395,13 +423,32 @@
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const base64 = e.target.result;
-                const pIndex = passageiros.findIndex(x => x.id == idAlunoAtivo);
-                passageiros[pIndex].foto = base64;
-                localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
-                document.getElementById('imgFicha').src = base64;
-                document.getElementById('imgFicha').classList.remove('hidden');
-                document.getElementById('fotoPlaceholder').classList.add('hidden');
+                const img = new Image();
+                img.onload = function() {
+                    // Redução de qualidade e tamanho usando Canvas
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 400; // Resolução suficiente para mobile
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Converte para Base64 com 70% de qualidade
+                    const base64 = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    const pIndex = passageiros.findIndex(x => x.id == idAlunoAtivo);
+                    passageiros[pIndex].foto = base64;
+                    localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
+                    
+                    const imgEl = document.getElementById('imgFicha');
+                    imgEl.src = base64;
+                    imgEl.classList.remove('hidden');
+                    document.getElementById('fotoPlaceholder').classList.add('hidden');
+                    document.getElementById('btnRemoverFoto').classList.remove('hidden');
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -529,18 +576,21 @@
     function getTurnoClass(t) { return t === 'Manhã' ? 'turno-manha' : t === 'Tarde' ? 'turno-tarde' : 'turno-noite'; }
     function atualizarContador() { document.getElementById('totalPassageiros').innerText = `Total: ${passageiros.length} passageiros`; }
     function abrirZap(t) { window.open(`https://wa.me/55${t.replace(/\D/g,'')}`, '_blank'); }
+    
     function enviarRecibo(id, mes) {
         const p = passageiros.find(x => x.id == id);
         const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
         let t = configMsg.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
         window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
     }
+    
     function enviarCobranca(id, mes) {
         const p = passageiros.find(x => x.id == id);
         const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
         let t = configCobranca.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
         window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
     }
+    
     function excluir(id) { if(confirm("Excluir cadastro permanentemente?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
     
     function salvarConfig() {
@@ -553,40 +603,30 @@
         alert("Configurações salvas!");
     }
 
-    function exportarJSON() { 
-        const dados = {
-            passageiros: passageiros,
-            gastos: gastos,
-            config: { recibo: configMsg, cobranca: configCobranca, boasVindas: configBoasVindas },
-            versao: "1.2",
-            data: new Date().toISOString()
+    function exportarJSON() {
+        const dados = { passageiros, gastos, config: { configMsg, configCobranca, configBoasVindas } };
+        const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `backup_van_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+    }
+
+    function importarJSON(event) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const d = JSON.parse(e.target.result);
+            if(confirm("Importar dados e sobrescrever os atuais?")) {
+                localStorage.setItem('van_dados_v1', JSON.stringify(d.passageiros));
+                localStorage.setItem('van_gastos_v1', JSON.stringify(d.gastos));
+                location.reload();
+            }
         };
-        const blob = new Blob([JSON.stringify(dados)], {type: 'application/json'}); 
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_van_pro_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click(); 
-        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        reader.readAsText(event.target.files[0]);
     }
 
-    function importarJSON(e) { 
-        const reader = new FileReader(); 
-        reader.onload = (ev) => { 
-            try {
-                const d = JSON.parse(ev.target.result); 
-                passageiros = (d.passageiros || d.p || []).map(p => ({
-                    ...p, endereco: p.endereco || "", bairro: p.bairro || "", observacoes: p.observacoes || "", foto: p.foto || null
-                })); 
-                gastos = d.gastos || d.g || [];
-                if(d.config) {
-                    configMsg = d.config.recibo || configMsg; configCobranca = d.config.cobranca || configCobranca; configBoasVindas = d.config.boasVindas || configBoasVindas;
-                    localStorage.setItem('van_msg_recibo', configMsg); localStorage.setItem('van_msg_cobranca', configCobranca); localStorage.setItem('van_msg_boasvindas', configBoasVindas);
-                }
-                localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); 
-                alert("Backup restaurado com sucesso!"); location.reload(); 
-            } catch (err) { alert("Erro ao importar arquivo!"); }
-        }; 
-        reader.readAsText(e.target.files[0]); 
-    }
-
-    window.onload = () => { renderPainel(); atualizarContador(); };
+    // Inicialização
+    renderPainel();
 </script>
 </body>
 </html>
