@@ -135,7 +135,7 @@
         .gasto-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #e2e8f0; }
         .resumo-lucro { grid-column: span 2; background: #0f172a; border: 1px solid var(--primary); text-align: center; }
 
-        /* Estilos da Carteirinha Escola - Versão 1.1 */
+        /* Estilos da Carteirinha Escola - Versão 1.2 */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 15px; }
         .carteirinha { width: 100%; max-width: 420px; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--primary); position: relative; }
         .carteirinha-header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 14px; }
@@ -143,6 +143,11 @@
         .carteirinha-info p { margin: 5px 0; font-size: 12px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
         .carteirinha-info strong { color: var(--primary); font-size: 10px; text-transform: uppercase; display: block; }
         
+        /* Campo Mensalidade Borrado */
+        .valor-privado { filter: blur(5px); transition: filter 0.3s; user-select: none; }
+        .valor-visivel { filter: blur(0); }
+        .btn-toggle-valor { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer; margin-left: 5px; color: #64748b; vertical-align: middle; }
+
         .foto-aluno { width: 130px; height: 160px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #f8fafc; position: relative; }
         .foto-aluno img { width: 100%; height: 100%; object-fit: cover; }
         .btn-foto { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer; }
@@ -369,6 +374,18 @@
         atualizarContador();
     }
 
+    function toggleValorPrivacidade() {
+        const span = document.getElementById('valorFicha');
+        const btn = document.getElementById('btnToggleValor');
+        if(span.classList.contains('valor-visivel')) {
+            span.classList.remove('valor-visivel');
+            btn.innerText = '👁️ Mostrar';
+        } else {
+            span.classList.add('valor-visivel');
+            btn.innerText = '🔒 Ocultar';
+        }
+    }
+
     function abrirFicha(id) {
         idAlunoAtivo = id;
         const p = passageiros.find(x => x.id == id);
@@ -381,7 +398,11 @@
             <p><strong>Telefone</strong>${p.telefone}</p>
             <p><strong>Endereço</strong>${p.endereco || 'Não informado'}</p>
             <p><strong>Bairro</strong>${p.bairro || 'Não informado'}</p>
-            <p><strong>Mensalidade</strong>R$ ${parseFloat(p.valor).toFixed(2)} (Dia ${p.vencimento})</p>
+            <p><strong>Mensalidade</strong>
+               <span id="valorFicha" class="valor-privado">R$ ${parseFloat(p.valor).toFixed(2)}</span>
+               <button id="btnToggleValor" class="btn-toggle-valor" onclick="toggleValorPrivacidade()">👁️ Mostrar</button>
+               <br><small>(Dia ${p.vencimento})</small>
+            </p>
         `;
         obs.innerText = p.observacoes ? `Observações: ${p.observacoes}` : "Sem observações adicionais.";
         
@@ -425,23 +446,17 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    // Redução de qualidade e tamanho usando Canvas
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 400; // Resolução suficiente para mobile
+                    const MAX_WIDTH = 400; 
                     const scaleSize = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
                     canvas.height = img.height * scaleSize;
-
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                    // Converte para Base64 com 70% de qualidade
                     const base64 = canvas.toDataURL('image/jpeg', 0.7);
-                    
                     const pIndex = passageiros.findIndex(x => x.id == idAlunoAtivo);
                     passageiros[pIndex].foto = base64;
                     localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
-                    
                     const imgEl = document.getElementById('imgFicha');
                     imgEl.src = base64;
                     imgEl.classList.remove('hidden');
@@ -625,7 +640,6 @@
         reader.readAsText(event.target.files[0]);
     }
 
-    // Inicialização
     renderPainel();
 </script>
 </body>
