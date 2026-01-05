@@ -208,6 +208,7 @@
 
 <script>
     let passageiros = JSON.parse(localStorage.getItem('van_dados_v1')) || [];
+    // ATENÇÃO: Os índices do array meses correspondem aos meses reais (Fev = idx 0, Mar = idx 1, etc)
     const meses = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     
     const msgPadraoRecibo = "*CONFIRMAÇÃO DE PAGAMENTO*\n\nOlá, seu pagamento foi processado.\n- *Passageiro:* {nome}\n- *Mês:* {mes}\n- *Valor:* R$ {valor}\n- *Status:* PAGO ✅";
@@ -265,17 +266,18 @@
         const hMeses = document.getElementById('headerMeses');
         const corpo = document.getElementById('corpoPainel');
         const busca = document.getElementById('buscaNome').value.toLowerCase();
+        
         const dataHoje = new Date();
-        const diaAtual = dataHoje.getDate();
-        const mesRealIdx = dataHoje.getMonth();
-        let mesAtualNome = (mesRealIdx === 0) ? "Fev" : meses[mesRealIdx - 1];
-
-        document.getElementById('txtMesAtivo').innerText = mesAtualNome;
-        document.getElementById('txtMesAtivo2').innerText = mesAtualNome;
+        const diaHoje = dataHoje.getDate();
+        const mesHojeIdxReal = dataHoje.getMonth(); // 0 = Jan, 1 = Fev...
+        
+        // Mapeamos o mês atual para o nosso array (nossa tabela começa em Fev)
+        // Se mesHojeIdxReal é 1 (Fev), o índice no array 'meses' é 0.
+        const mesAtualTabelaIdx = mesHojeIdxReal - 1; 
 
         hMeses.innerHTML = '<th>Passageiro / Responsável</th>';
-        meses.forEach(m => { 
-            hMeses.innerHTML += `<th style="${m === mesAtualNome ? 'background:var(--primary)' : ''}">${m}</th>`; 
+        meses.forEach((m, idx) => { 
+            hMeses.innerHTML += `<th style="${idx === mesAtualTabelaIdx ? 'background:var(--primary)' : ''}">${m}</th>`; 
         });
 
         corpo.innerHTML = '';
@@ -293,16 +295,25 @@
                 </div>
             </td>`;
 
-            meses.forEach(m => {
+            meses.forEach((m, idxMesColuna) => {
                 const isPago = p.pagamentos && p.pagamentos[m];
                 const diaVencimento = parseInt(p.vencimento);
                 
-                // LÓGICA RIGOROSA: 
-                // 1. Deve estar em aberto (!isPago)
-                // 2. O dia atual deve ser maior ou igual ao dia de vencimento
-                const deveMostrarCobranca = !isPago && (diaAtual >= diaVencimento);
+                // Lógica da cobrança:
+                let deveMostrarCobranca = false;
+                
+                if (!isPago) {
+                    // 1. Se o mês da coluna já passou em relação ao mês atual
+                    if (idxMesColuna < mesAtualTabelaIdx) {
+                        deveMostrarCobranca = true;
+                    } 
+                    // 2. Se a coluna é o mês atual e o dia de hoje é >= vencimento
+                    else if (idxMesColuna === mesAtualTabelaIdx && diaHoje >= diaVencimento) {
+                        deveMostrarCobranca = true;
+                    }
+                }
 
-                if(m === mesAtualNome) { 
+                if(idxMesColuna === mesAtualTabelaIdx) { 
                     const valorNum = parseFloat(p.valor) || 0;
                     if(isPago) mRec += valorNum; else mPend += valorNum; 
                 }
@@ -321,6 +332,10 @@
             corpo.appendChild(tr);
         });
 
+        // Atualiza textos do rodapé financeiro
+        const nomeMesAtual = meses[mesAtualTabelaIdx] || "---";
+        document.getElementById('txtMesAtivo').innerText = nomeMesAtual;
+        document.getElementById('txtMesAtivo2').innerText = nomeMesAtual;
         document.getElementById('mRecebido').innerText = `R$ ${mRec.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
         document.getElementById('mReceber').innerText = `R$ ${mPend.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
         atualizarContador();
