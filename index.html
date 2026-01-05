@@ -99,8 +99,6 @@
 
         tbody tr:nth-child(even) td { background-color: var(--zebra); }
         tbody tr:nth-child(odd) td { background-color: #ffffff; }
-        tbody tr:nth-child(even) td:first-child { background-color: var(--zebra); }
-        tbody tr:nth-child(odd) td:first-child { background-color: #ffffff; }
 
         td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 12px; text-align: center; }
 
@@ -113,8 +111,9 @@
         .turno-tarde { background: var(--tarde); color: var(--tarde-txt); }
         .turno-noite { background: var(--noite); color: var(--noite-txt); }
 
-        input, select, textarea { width: 100%; padding: 14px; margin-top: 5px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; background: white; }
-        textarea { height: 100px; font-family: sans-serif; font-size: 14px; resize: none; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 4px; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; background: white; }
+        textarea { height: 80px; font-family: sans-serif; font-size: 14px; resize: none; }
+        label { font-size: 11px; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-left: 2px; }
         
         .btn { padding: 8px 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; text-align: center; }
         .btn-primary { background: var(--primary); color: white; width: 100%; }
@@ -135,26 +134,30 @@
         .gasto-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #e2e8f0; }
         .resumo-lucro { grid-column: span 2; background: #0f172a; border: 1px solid var(--primary); text-align: center; }
 
-        /* Estilos da Carteirinha Escola - Versão 1.2 */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 15px; }
-        .carteirinha { width: 100%; max-width: 420px; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--primary); position: relative; }
+        /* Estilos da Carteirinha (Modais) */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 10px; overflow-y: auto; }
+        .carteirinha { width: 100%; max-width: 450px; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 3px solid var(--primary); position: relative; margin: auto; }
         .carteirinha-header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 14px; }
-        .carteirinha-corpo { padding: 15px; display: grid; grid-template-columns: 1fr 130px; gap: 10px; }
+        .carteirinha-corpo { padding: 15px; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .full-width { grid-column: span 2; }
+
+        /* Visualização de Ficha */
+        .ficha-layout { display: grid; grid-template-columns: 1fr 120px; gap: 10px; }
         .carteirinha-info p { margin: 5px 0; font-size: 12px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
         .carteirinha-info strong { color: var(--primary); font-size: 10px; text-transform: uppercase; display: block; }
-        
-        /* Campo Mensalidade Borrado */
         .valor-privado { filter: blur(5px); transition: filter 0.3s; user-select: none; }
         .valor-visivel { filter: blur(0); }
-        .btn-toggle-valor { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer; margin-left: 5px; color: #64748b; vertical-align: middle; }
+        .btn-toggle-valor { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer; margin-left: 5px; color: #64748b; }
 
-        .foto-aluno { width: 130px; height: 160px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #f8fafc; position: relative; }
+        .foto-aluno { width: 120px; height: 150px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #f8fafc; position: relative; }
         .foto-aluno img { width: 100%; height: 100%; object-fit: cover; }
         .btn-foto { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer; }
-        .btn-apagar-foto { position: absolute; top: 5px; right: 5px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 10; font-size: 12px; }
+        .btn-apagar-foto { position: absolute; top: 5px; right: 5px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 10; font-size: 11px; }
         
         .carteirinha-footer { padding: 15px; background: #f8fafc; display: flex; gap: 10px; }
-        .observacoes-box { grid-column: span 2; background: #fffde7; padding: 8px; border-radius: 6px; font-size: 11px; font-style: italic; border: 1px solid #fef08a; }
+        .observacoes-box { background: #fffde7; padding: 8px; border-radius: 6px; font-size: 11px; font-style: italic; border: 1px solid #fef08a; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -169,7 +172,7 @@
         <div class="tabs">
             <button class="tab-btn active" id="btn-painel" onclick="showTab('painel')">Pagamentos</button>
             <button class="tab-btn" id="btn-detalhes" onclick="showTab('detalhes')">Alunos</button>
-            <button class="tab-btn" id="btn-cadastro" onclick="showTab('cadastro')">Novo</button>
+            <button class="tab-btn" id="btn-cadastro" onclick="abrirModalCadastro()">Novo</button>
             <button class="tab-btn" id="btn-config" onclick="showTab('config')">Config</button>
         </div>
         <div class="tabs-bottom">
@@ -199,8 +202,8 @@
             <button type="submit" class="btn btn-primary" style="background:var(--danger); padding: 15px; font-size: 14px;">LANÇAR DESPESA AGORA</button>
         </form>
         <hr>
-        <div id="filtroContainer" class="container" style="background:#f1f5f9; margin-bottom:15px; padding:10px;">
-            <label style="font-size:12px; font-weight:bold;">Filtrar Período:</label>
+        <div id="filtroContainer" style="background:#f1f5f9; margin-bottom:15px; padding:10px; border-radius: 8px;">
+            <label style="font-size:10px; font-weight:bold; display: block; margin-bottom: 5px;">Filtrar Período:</label>
             <select id="filtroMesFluxo" onchange="renderFluxo()"></select>
         </div>
         <div class="financeiro">
@@ -221,63 +224,103 @@
         </div>
     </section>
 
-    <section id="cadastro" class="hidden">
-        <form id="formCadastro">
-            <input type="hidden" id="editId">
-            <input type="text" id="nome" placeholder="Nome do Aluno" required>
-            <input type="text" id="responsavel" placeholder="Responsável">
-            <input type="text" id="escola" placeholder="Escola">
-            <select id="turno">
-                <option value="Manhã">Manhã</option>
-                <option value="Tarde">Tarde</option>
-                <option value="Noite">Noite</option>
-            </select>
-            <input type="number" step="0.01" id="valor" placeholder="Mensalidade R$" required>
-            <input type="number" id="vencimento" placeholder="Dia Vencimento" required>
-            <input type="text" id="telefone" placeholder="Telefone" oninput="maskTel(this)">
-            
-            <input type="text" id="endereco" placeholder="Endereço Completo">
-            <input type="text" id="bairro" placeholder="Bairro">
-            <textarea id="observacoes" placeholder="Observações (opcional)"></textarea>
-
-            <div class="checkbox-container">
-                <input type="checkbox" id="enviarBoasVindas">
-                <label for="enviarBoasVindas">Enviar boas-vindas WhatsApp</label>
-            </div>
-            <button type="submit" class="btn btn-primary" style="padding: 15px; font-size: 14px;">SALVAR CADASTRO</button>
-            <button type="button" class="btn" style="width:100%; margin-top:10px; background:#94a3b8; color:white;" onclick="showTab('painel')">CANCELAR</button>
-        </form>
-    </section>
-
     <section id="config" class="hidden">
         <h3>Configurações de Mensagens</h3>
-        <label class="config-label">Recibo (Confirmação)</label>
+        <label>Recibo (Confirmação)</label>
         <textarea id="msgRecibo"></textarea>
-        <label class="config-label">Cobrança (Aviso)</label>
+        <label>Cobrança (Aviso)</label>
         <textarea id="msgCobranca"></textarea>
-        <label class="config-label">Boas-Vindas (Novo Aluno)</label>
+        <label>Boas-Vindas (Novo Aluno)</label>
         <textarea id="msgBoasVindas"></textarea>
         <button class="btn btn-primary" onclick="salvarConfig()" style="padding: 15px; font-size: 14px;">SALVAR CONFIGURAÇÕES</button>
         <hr>
         <div style="display:flex; gap:8px;">
-            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Fazer Backup Geral</button>
+            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Fazer Backup</button>
             <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Importar Backup</button>
             <input type="file" id="importFile" style="display:none" onchange="importarJSON(event)">
         </div>
     </section>
 </div>
 
+<div id="modalCadastro" class="modal-overlay hidden">
+    <div class="carteirinha">
+        <div class="carteirinha-header">Cadastro / Edição de Aluno</div>
+        <form id="formCadastro">
+            <div class="carteirinha-corpo">
+                <input type="hidden" id="editId">
+                <div class="form-grid">
+                    <div class="full-width">
+                        <label>Nome do Aluno</label>
+                        <input type="text" id="nome" placeholder="Ex: João Silva" required>
+                    </div>
+                    <div>
+                        <label>Responsável</label>
+                        <input type="text" id="responsavel" placeholder="Pai/Mãe">
+                    </div>
+                    <div>
+                        <label>Telefone</label>
+                        <input type="text" id="telefone" placeholder="(00) 00000-0000" oninput="maskTel(this)">
+                    </div>
+                    <div class="full-width">
+                        <label>Escola</label>
+                        <input type="text" id="escola" placeholder="Nome da Instituição">
+                    </div>
+                    <div>
+                        <label>Turno</label>
+                        <select id="turno">
+                            <option value="Manhã">Manhã</option>
+                            <option value="Tarde">Tarde</option>
+                            <option value="Noite">Noite</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Vencimento (Dia)</label>
+                        <input type="number" id="vencimento" placeholder="05" required>
+                    </div>
+                    <div>
+                        <label>Mensalidade (R$)</label>
+                        <input type="number" step="0.01" id="valor" placeholder="250,00" required>
+                    </div>
+                    <div>
+                        <label>Bairro</label>
+                        <input type="text" id="bairro" placeholder="Centro">
+                    </div>
+                    <div class="full-width">
+                        <label>Endereço</label>
+                        <input type="text" id="endereco" placeholder="Rua, número...">
+                    </div>
+                    <div class="full-width">
+                        <label>Observações</label>
+                        <textarea id="observacoes" placeholder="Alergias, autorizações..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="checkbox-container" style="margin-top: 10px;">
+                    <input type="checkbox" id="enviarBoasVindas">
+                    <label for="enviarBoasVindas" style="color: var(--text);">Enviar Boas-Vindas Zap</label>
+                </div>
+            </div>
+            <div class="carteirinha-footer">
+                <button type="submit" class="btn btn-primary" style="flex:2; font-size: 13px;">SALVAR DADOS</button>
+                <button type="button" class="btn" style="background:#94a3b8; color:white; flex:1;" onclick="fecharModalCadastro()">FECHAR</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div id="modalFicha" class="modal-overlay hidden">
     <div class="carteirinha">
         <div class="carteirinha-header">Ficha Individual do Aluno</div>
         <div class="carteirinha-corpo">
-            <div class="carteirinha-info" id="infoFicha"></div>
-            <div class="foto-aluno">
-                <button id="btnRemoverFoto" class="btn-apagar-foto hidden" onclick="removerFoto()">X</button>
-                <img id="imgFicha" src="" class="hidden">
-                <span id="fotoPlaceholder" style="font-size:10px; color:#94a3b8; text-align:center;">SEM FOTO</span>
-                <input type="file" id="inputFoto" accept="image/*" capture="camera" style="display:none" onchange="processarFoto(event)">
-                <button class="btn-foto" onclick="document.getElementById('inputFoto').click()">FOTO/CÂMERA</button>
+            <div class="ficha-layout">
+                <div class="carteirinha-info" id="infoFicha"></div>
+                <div class="foto-aluno">
+                    <button id="btnRemoverFoto" class="btn-apagar-foto hidden" onclick="removerFoto()">X</button>
+                    <img id="imgFicha" src="" class="hidden">
+                    <span id="fotoPlaceholder" style="font-size:10px; color:#94a3b8; text-align:center;">SEM FOTO</span>
+                    <input type="file" id="inputFoto" accept="image/*" capture="camera" style="display:none" onchange="processarFoto(event)">
+                    <button class="btn-foto" onclick="document.getElementById('inputFoto').click()">FOTO/CÂMERA</button>
+                </div>
             </div>
             <div class="observacoes-box" id="obsFicha"></div>
         </div>
@@ -303,11 +346,24 @@
         document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
         document.getElementById(tabId).classList.remove('hidden');
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-' + tabId).classList.add('active');
+        if(tabId !== 'cadastro') {
+            const btn = document.getElementById('btn-' + tabId);
+            if(btn) btn.classList.add('active');
+        }
         if(tabId === 'painel') renderPainel();
         if(tabId === 'detalhes') renderDetalhes();
         if(tabId === 'fluxo') { preencherFiltroMes(); renderFluxo(); }
         if(tabId === 'config') preencherCamposConfig();
+    }
+
+    function abrirModalCadastro() {
+        document.getElementById('formCadastro').reset();
+        document.getElementById('editId').value = '';
+        document.getElementById('modalCadastro').classList.remove('hidden');
+    }
+
+    function fecharModalCadastro() {
+        document.getElementById('modalCadastro').classList.add('hidden');
     }
 
     function preencherCamposConfig() {
@@ -379,10 +435,10 @@
         const btn = document.getElementById('btnToggleValor');
         if(span.classList.contains('valor-visivel')) {
             span.classList.remove('valor-visivel');
-            btn.innerText = '👁️ Mostrar';
+            btn.innerText = '👁️';
         } else {
             span.classList.add('valor-visivel');
-            btn.innerText = '🔒 Ocultar';
+            btn.innerText = '🔒';
         }
     }
 
@@ -396,28 +452,25 @@
             <p><strong>Responsável</strong>${p.responsavel || '-'}</p>
             <p><strong>Escola / Turno</strong>${p.escola} (${p.turno})</p>
             <p><strong>Telefone</strong>${p.telefone}</p>
-            <p><strong>Endereço</strong>${p.endereco || 'Não informado'}</p>
             <p><strong>Bairro</strong>${p.bairro || 'Não informado'}</p>
+            <p><strong>Endereço</strong>${p.endereco || 'Não informado'}</p>
             <p><strong>Mensalidade</strong>
                <span id="valorFicha" class="valor-privado">R$ ${parseFloat(p.valor).toFixed(2)}</span>
-               <button id="btnToggleValor" class="btn-toggle-valor" onclick="toggleValorPrivacidade()">👁️ Mostrar</button>
-               <br><small>(Dia ${p.vencimento})</small>
+               <button id="btnToggleValor" class="btn-toggle-valor" onclick="toggleValorPrivacidade()">👁️</button>
+               <small>(Dia ${p.vencimento})</small>
             </p>
         `;
-        obs.innerText = p.observacoes ? `Observações: ${p.observacoes}` : "Sem observações adicionais.";
+        obs.innerText = p.observacoes ? `Obs: ${p.observacoes}` : "Sem observações adicionais.";
         
         const img = document.getElementById('imgFicha');
         const placeholder = document.getElementById('fotoPlaceholder');
         const btnRemover = document.getElementById('btnRemoverFoto');
 
         if(p.foto) { 
-            img.src = p.foto; 
-            img.classList.remove('hidden'); 
-            placeholder.classList.add('hidden'); 
-            btnRemover.classList.remove('hidden');
+            img.src = p.foto; img.classList.remove('hidden'); 
+            placeholder.classList.add('hidden'); btnRemover.classList.remove('hidden');
         } else { 
-            img.classList.add('hidden'); 
-            placeholder.classList.remove('hidden'); 
+            img.classList.add('hidden'); placeholder.classList.remove('hidden'); 
             btnRemover.classList.add('hidden');
         }
 
@@ -426,11 +479,10 @@
     }
 
     function removerFoto() {
-        if(confirm("Deseja apagar a foto deste aluno?")) {
+        if(confirm("Apagar foto?")) {
             const pIndex = passageiros.findIndex(x => x.id == idAlunoAtivo);
             passageiros[pIndex].foto = null;
             localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
-            
             document.getElementById('imgFicha').classList.add('hidden');
             document.getElementById('fotoPlaceholder').classList.remove('hidden');
             document.getElementById('btnRemoverFoto').classList.add('hidden');
@@ -457,9 +509,8 @@
                     const pIndex = passageiros.findIndex(x => x.id == idAlunoAtivo);
                     passageiros[pIndex].foto = base64;
                     localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
-                    const imgEl = document.getElementById('imgFicha');
-                    imgEl.src = base64;
-                    imgEl.classList.remove('hidden');
+                    document.getElementById('imgFicha').src = base64;
+                    document.getElementById('imgFicha').classList.remove('hidden');
                     document.getElementById('fotoPlaceholder').classList.add('hidden');
                     document.getElementById('btnRemoverFoto').classList.remove('hidden');
                 };
@@ -509,8 +560,9 @@
             let t = configBoasVindas.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{vencimento}/g, p.vencimento).replace(/{valor}/g, v);
             window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
         }
-        e.target.reset(); document.getElementById('editId').value = '';
-        showTab('detalhes');
+        fecharModalCadastro();
+        renderDetalhes();
+        renderPainel();
     });
 
     function renderDetalhes() {
@@ -539,7 +591,7 @@
         document.getElementById('endereco').value = p.endereco || '';
         document.getElementById('bairro').value = p.bairro || '';
         document.getElementById('observacoes').value = p.observacoes || '';
-        showTab('cadastro');
+        document.getElementById('modalCadastro').classList.remove('hidden');
     }
 
     function preencherFiltroMes() {
@@ -574,72 +626,31 @@
         let totalRecebido = 0;
         passageiros.forEach(p => { const chave = `${mesChave}_${anoAlvo}`; if(p.pagamentos && p.pagamentos[chave]) totalRecebido += parseFloat(p.valor || 0); });
         let totalGastos = 0;
-        lista.innerHTML = `<h4 style="font-size:14px; border-bottom:1px solid #ddd; padding-bottom:5px;">Gastos em ${mesChave}/${anoAlvo}</h4>`;
-        gastos.filter(g => { const d = new Date(g.data + 'T00:00:00'); return d.getMonth() === mesAlvo && d.getFullYear() === anoAlvo; }).forEach(g => {
+        lista.innerHTML = '';
+        gastos.filter(g => {
+            const dg = new Date(g.data);
+            return dg.getMonth() === mesAlvo && dg.getFullYear() === anoAlvo;
+        }).forEach(g => {
             totalGastos += g.valor;
-            lista.innerHTML += `<div class="gasto-item"><span><strong>${g.desc}</strong></span><span>R$ ${g.valor.toLocaleString('pt-br',{minimumFractionDigits:2})} <button onclick="removerGasto(${g.id})" style="color:red; border:none; background:none; font-weight:bold; cursor:pointer;">X</button></span></div>`;
+            lista.innerHTML += `<div class="gasto-item"><div>${g.desc}<br><small>${g.data}</small></div><div>R$ ${g.valor.toFixed(2)} <button onclick="excluirGasto(${g.id})" style="border:none;background:none;color:red">🗑️</button></div></div>`;
         });
-        document.getElementById('fluxoRecebido').innerText = `R$ ${totalRecebido.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
-        document.getElementById('fluxoGastos').innerText = `R$ ${totalGastos.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
-        const lucro = totalRecebido - totalGastos;
-        document.getElementById('fluxoLucro').innerText = `R$ ${lucro.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
-        document.getElementById('fluxoLucro').style.color = lucro >= 0 ? 'var(--success)' : 'var(--danger)';
+        document.getElementById('fluxoRecebido').innerText = `R$ ${totalRecebido.toFixed(2)}`;
+        document.getElementById('fluxoGastos').innerText = `R$ ${totalGastos.toFixed(2)}`;
+        document.getElementById('fluxoLucro').innerText = `R$ ${(totalRecebido - totalGastos).toFixed(2)}`;
     }
 
-    function removerGasto(id) { if(confirm("Excluir este gasto?")) { gastos = gastos.filter(g => g.id !== id); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); renderFluxo(); } }
-    function maskTel(i) { let v = i.value.replace(/\D/g, ""); v = v.replace(/^(\d{2})(\d)/g, "($1) $2"); v = v.replace(/(\d)(\d{4})$/, "$1-$2"); i.value = v; }
-    function getTurnoClass(t) { return t === 'Manhã' ? 'turno-manha' : t === 'Tarde' ? 'turno-tarde' : 'turno-noite'; }
+    function excluirGasto(id) { if(confirm("Excluir?")){ gastos = gastos.filter(g => g.id !== id); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); renderFluxo(); }}
+    function salvarConfig() { configMsg = document.getElementById('msgRecibo').value; configCobranca = document.getElementById('msgCobranca').value; configBoasVindas = document.getElementById('msgBoasVindas').value; localStorage.setItem('van_msg_recibo', configMsg); localStorage.setItem('van_msg_cobranca', configCobranca); localStorage.setItem('van_msg_boasvindas', configBoasVindas); alert("Salvo!"); }
+    function excluir(id) { if(confirm("Excluir passageiro?")){ passageiros = passageiros.filter(p => p.id !== id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); renderPainel(); }}
     function atualizarContador() { document.getElementById('totalPassageiros').innerText = `Total: ${passageiros.length} passageiros`; }
-    function abrirZap(t) { window.open(`https://wa.me/55${t.replace(/\D/g,'')}`, '_blank'); }
+    function getTurnoClass(t) { return t === 'Manhã' ? 'turno-manha' : t === 'Tarde' ? 'turno-tarde' : 'turno-noite'; }
+    function maskTel(i) { let v = i.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); i.value = v; }
+    function abrirZap(tel) { window.open(`https://wa.me/55${tel.replace(/\D/g,'')}`, '_blank'); }
+    function enviarRecibo(id, mes) { const p = passageiros.find(x => x.id == id); const v = p.valor.toLocaleString('pt-br',{minimumFractionDigits:2}); const t = configMsg.replace(/{nome}/g, p.nome).replace(/{mes}/g, mes).replace(/{valor}/g, v); abrirZap(p.telefone + "?text=" + encodeURIComponent(t)); }
+    function enviarCobranca(id, mes) { const p = passageiros.find(x => x.id == id); const v = p.valor.toLocaleString('pt-br',{minimumFractionDigits:2}); const t = configCobranca.replace(/{nome}/g, p.nome).replace(/{mes}/g, mes).replace(/{valor}/g, v); abrirZap(p.telefone + "?text=" + encodeURIComponent(t)); }
+    function exportarJSON() { const b = new Blob([JSON.stringify({passageiros, gastos})], {type:'application/json'}); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href=u; a.download='backup.json'; a.click(); }
+    function importarJSON(e) { const r = new FileReader(); r.onload = (x) => { const d = JSON.parse(x.target.result); passageiros = d.passageiros; gastos = d.gastos; localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); location.reload(); }; r.readAsText(e.target.files[0]); }
     
-    function enviarRecibo(id, mes) {
-        const p = passageiros.find(x => x.id == id);
-        const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
-        let t = configMsg.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
-        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
-    }
-    
-    function enviarCobranca(id, mes) {
-        const p = passageiros.find(x => x.id == id);
-        const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
-        let t = configCobranca.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
-        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
-    }
-    
-    function excluir(id) { if(confirm("Excluir cadastro permanentemente?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
-    
-    function salvarConfig() {
-        configMsg = document.getElementById('msgRecibo').value;
-        configCobranca = document.getElementById('msgCobranca').value;
-        configBoasVindas = document.getElementById('msgBoasVindas').value;
-        localStorage.setItem('van_msg_recibo', configMsg);
-        localStorage.setItem('van_msg_cobranca', configCobranca);
-        localStorage.setItem('van_msg_boasvindas', configBoasVindas);
-        alert("Configurações salvas!");
-    }
-
-    function exportarJSON() {
-        const dados = { passageiros, gastos, config: { configMsg, configCobranca, configBoasVindas } };
-        const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `backup_van_${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-    }
-
-    function importarJSON(event) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const d = JSON.parse(e.target.result);
-            if(confirm("Importar dados e sobrescrever os atuais?")) {
-                localStorage.setItem('van_dados_v1', JSON.stringify(d.passageiros));
-                localStorage.setItem('van_gastos_v1', JSON.stringify(d.gastos));
-                location.reload();
-            }
-        };
-        reader.readAsText(event.target.files[0]);
-    }
-
     renderPainel();
 </script>
 </body>
