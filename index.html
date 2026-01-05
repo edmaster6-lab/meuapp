@@ -17,6 +17,13 @@
             --danger: #ef4444;
             --bg: #f1f5f9;
             --text: #1e293b;
+            /* Cores dos Turnos */
+            --manha: #dbeafe;
+            --manha-txt: #1e40af;
+            --tarde: #ffedd5;
+            --tarde-txt: #9a3412;
+            --noite: #4c1d95;
+            --noite-txt: #ffffff;
         }
 
         * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -33,13 +40,24 @@
         .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         th { background: #1e293b; color: white; padding: 12px; font-size: 11px; text-align: center; }
-        th:first-child { position: sticky; left: 0; z-index: 3; background: #1e293b; text-align: left; min-width: 160px; }
-        td:first-child { position: sticky; left: 0; z-index: 2; background: white; text-align: left; font-weight: bold; border-right: 2px solid #f1f5f9; }
+        
+        th:first-child { position: sticky; left: 0; z-index: 3; background: #1e293b; text-align: left; min-width: 180px; }
+        td:first-child { 
+            position: sticky; left: 0; z-index: 2; background: white; text-align: left; 
+            font-weight: bold; border-right: 2px solid #f1f5f9; font-size: 15px; line-height: 1.2;
+        }
+        
         td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 12px; text-align: center; }
 
+        /* Estilos dos Crachás */
         .status-badge { padding: 4px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; display: block; margin-bottom: 4px; }
         .status-pago { background: #dcfce7; color: #166534; }
         .status-aberto { background: #fef9c3; color: #854d0e; }
+
+        .badge-turno { padding: 2px 5px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; display: inline-block; margin-top: 2px; }
+        .turno-manha { background: var(--manha); color: var(--manha-txt); }
+        .turno-tarde { background: var(--tarde); color: var(--tarde-txt); }
+        .turno-noite { background: var(--noite); color: var(--noite-txt); }
 
         input, select, textarea { width: 100%; padding: 14px; margin-top: 5px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; background: white; }
         textarea { height: 100px; font-family: monospace; font-size: 14px; resize: none; }
@@ -56,10 +74,11 @@
 
         .config-label { font-weight: bold; font-size: 13px; display: block; margin-top: 10px; color: var(--primary); }
         .hidden { display: none !important; }
-        .info-sub { font-size: 10px; color: #64748b; font-weight: normal; display: block; margin-top: 2px; }
+        .info-sub { font-size: 10px; color: #64748b; font-weight: normal; display: block; }
         
-        .checkbox-container { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 14px; font-weight: bold; color: var(--text); }
+        .checkbox-container { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
         .checkbox-container input { width: auto; margin: 0; }
+        .nome-destaque { font-size: 16px; display: block; margin-bottom: 2px; }
     </style>
 </head>
 <body>
@@ -114,30 +133,24 @@
             <input type="number" step="0.01" id="valor" placeholder="Valor Mensalidade R$" required>
             <input type="number" id="vencimento" placeholder="Dia Vencimento (1-31)" required>
             <input type="text" id="telefone" placeholder="Telefone (DDD) 99999-9999" oninput="maskTel(this)">
-            
             <div class="checkbox-container">
                 <input type="checkbox" id="enviarBoasVindas">
                 <label for="enviarBoasVindas">Enviar boas-vindas ao salvar</label>
             </div>
-            
             <button type="submit" class="btn btn-primary" style="padding:15px; font-size:14px">SALVAR DADOS</button>
         </form>
     </section>
 
     <section id="config" class="hidden">
-        <h3>Configurações de Mensagens</h3>
-        <label class="config-label">Mensagem de Recibo (Pago)</label>
-        <textarea id="msgRecibo"></textarea>
-        <label class="config-label">Mensagem de Cobrança (Pendente)</label>
-        <textarea id="msgCobranca"></textarea>
-        <label class="config-label">Mensagem de Boas-Vindas</label>
-        <textarea id="msgBoasVindas"></textarea>
-        <button class="btn btn-primary" onclick="salvarConfig()" style="padding:15px; margin-bottom: 20px;">SALVAR MENSAGENS</button>
+        <h3>Mensagens Personalizadas</h3>
+        <label class="config-label">Recibo (Pago)</label><textarea id="msgRecibo"></textarea>
+        <label class="config-label">Cobrança (Pendente)</label><textarea id="msgCobranca"></textarea>
+        <label class="config-label">Boas-Vindas</label><textarea id="msgBoasVindas"></textarea>
+        <button class="btn btn-primary" onclick="salvarConfig()" style="padding:15px; margin-bottom: 20px;">SALVAR CONFIGURAÇÕES</button>
         <hr>
-        <h3>Backup</h3>
         <div style="display:flex; gap:8px;">
-            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Exportar</button>
-            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Importar</button>
+            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Backup</button>
+            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Restaurar</button>
             <input type="file" id="importFile" style="display:none" onchange="importarJSON(event)">
         </div>
     </section>
@@ -149,11 +162,18 @@
     
     const msgPadraoRecibo = "*CONFIRMAÇÃO DE PAGAMENTO*\n\nOlá, informamos que o seu pagamento foi processado com sucesso.\n\n- *Passageiro:* {nome}\n- *Mês:* {mes}\n- *Valor:* R$ {valor}\n- *Status:* PAGO ✅";
     const msgPadraoCobranca = "*AVISO DE VENCIMENTO*\n\nOlá, notamos que o pagamento de {nome} referente ao mês de {mes} ainda não consta em nosso sistema.\n\n- *Valor:* R$ {valor}\n\nCaso já tenha efetuado, envie o comprovante.";
-    const msgPadraoBoasVindas = "*BOAS-VINDAS!*\n\nOlá {nome}, é um prazer ter você conosco no Transporte Pro 🚌.\n\nSeu cadastro foi realizado com sucesso!\n- *Vencimento:* Dia {vencimento}\n- *Valor:* R$ {valor}\n\nQualquer dúvida, estamos à disposição!";
+    const msgPadraoBoasVindas = "*BOAS-VINDAS!*\n\nOlá {nome}, é um prazer ter você conosco no Transporte Pro 🚌.\n\nSeu cadastro foi realizado com sucesso!\n- *Vencimento:* Dia {vencimento}\n- *Valor:* R$ {valor}";
 
     let configMsg = localStorage.getItem('van_msg_recibo') || msgPadraoRecibo;
     let configCobranca = localStorage.getItem('van_msg_cobranca') || msgPadraoCobranca;
     let configBoasVindas = localStorage.getItem('van_msg_boasvindas') || msgPadraoBoasVindas;
+
+    function getTurnoClass(turno) {
+        if(turno === 'Manhã') return 'turno-manha';
+        if(turno === 'Tarde') return 'turno-tarde';
+        if(turno === 'Noite') return 'turno-noite';
+        return '';
+    }
 
     function maskTel(i) {
         let v = i.value.replace(/\D/g, "");
@@ -183,7 +203,7 @@
         localStorage.setItem('van_msg_recibo', configMsg);
         localStorage.setItem('van_msg_cobranca', configCobranca);
         localStorage.setItem('van_msg_boasvindas', configBoasVindas);
-        alert("Salvo!");
+        alert("Configurações salvas!");
     }
 
     function renderPainel() {
@@ -211,7 +231,8 @@
             
             let rowHtml = `<td>
                 ${p.nome}
-                <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span class="badge-turno ${getTurnoClass(p.turno)}">${p.turno}</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top:4px;">
                     <span class="info-sub">Resp: ${p.responsavel || '---'}</span>
                     <a class="btn-ws" onclick="abrirZap('${p.telefone}')">💬</a>
                 </div>
@@ -263,18 +284,13 @@
 
     function enviarBoasVindas(p) {
         const valorF = parseFloat(p.valor).toLocaleString('pt-br', {minimumFractionDigits:2});
-        let textoFinal = configBoasVindas
-            .replace(/{nome}/g, p.nome.toUpperCase())
-            .replace(/{vencimento}/g, p.vencimento)
-            .replace(/{valor}/g, valorF);
+        let textoFinal = configBoasVindas.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{vencimento}/g, p.vencimento).replace(/{valor}/g, valorF);
         window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(textoFinal)}`, '_blank');
     }
 
     document.getElementById('formCadastro').addEventListener('submit', (e) => {
         e.preventDefault();
         const id = document.getElementById('editId').value;
-        const deveEnviarBV = document.getElementById('enviarBoasVindas').checked;
-        
         const p = { 
             id: id ? parseInt(id) : Date.now(), 
             nome: document.getElementById('nome').value, 
@@ -286,18 +302,11 @@
             telefone: document.getElementById('telefone').value, 
             pagamentos: id ? (passageiros.find(x => x.id == id).pagamentos || {}) : {} 
         };
-        
         if(id) passageiros[passageiros.findIndex(x => x.id == id)] = p;
         else passageiros.push(p);
-        
         localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
-        
-        if (deveEnviarBV) {
-            enviarBoasVindas(p);
-        }
-        
-        e.target.reset(); 
-        document.getElementById('editId').value = '';
+        if (document.getElementById('enviarBoasVindas').checked) { enviarBoasVindas(p); }
+        e.target.reset(); document.getElementById('editId').value = '';
         showTab('painel');
     });
 
@@ -306,8 +315,15 @@
         corpo.innerHTML = '';
         passageiros.forEach(p => {
             corpo.innerHTML += `<tr>
-                <td><strong>${p.nome}</strong><br><small>${p.escola || '---'} - ${p.turno}</small></td>
-                <td><button class="btn" style="background:#e2e8f0" onclick="editar(${p.id})">✏️</button><button class="btn" style="background:var(--danger);color:white" onclick="excluir(${p.id})">🗑️</button></td>
+                <td>
+                    <strong class="nome-destaque">${p.nome}</strong>
+                    <small>${p.escola || '---'}</small> - 
+                    <span class="badge-turno ${getTurnoClass(p.turno)}">${p.turno}</span>
+                </td>
+                <td>
+                    <button class="btn" style="background:#e2e8f0" onclick="editar(${p.id})">✏️</button>
+                    <button class="btn" style="background:var(--danger);color:white" onclick="excluir(${p.id})">🗑️</button>
+                </td>
             </tr>`;
         });
     }
@@ -326,10 +342,10 @@
         showTab('cadastro');
     }
 
-    function excluir(id) { if(confirm("Remover aluno?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
+    function excluir(id) { if(confirm("Remover?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
     function abrirZap(t) { window.open(`https://wa.me/55${t.replace(/\D/g,'')}`, '_blank'); }
-    function exportarJSON() { const blob = new Blob([JSON.stringify(passageiros)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_transporte.json`; a.click(); }
-    function importarJSON(e) { const reader = new FileReader(); reader.onload = (ev) => { try { passageiros = JSON.parse(ev.target.result); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderPainel(); } catch(err) { alert("Inválido"); } }; reader.readAsText(e.target.files[0]); }
+    function exportarJSON() { const blob = new Blob([JSON.stringify(passageiros)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup.json`; a.click(); }
+    function importarJSON(e) { const reader = new FileReader(); reader.onload = (ev) => { try { passageiros = JSON.parse(ev.target.result); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderPainel(); } catch(err) { alert("Erro"); } }; reader.readAsText(e.target.files[0]); }
     
     window.onload = renderPainel;
 </script>
