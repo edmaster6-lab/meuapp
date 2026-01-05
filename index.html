@@ -139,6 +139,8 @@
         .filtro-container { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .filtro-container label { font-size: 12px; font-weight: bold; color: var(--primary); }
         .filtro-container select { margin: 0; padding: 8px; font-size: 14px; flex: 1; }
+        
+        .config-label { font-size: 12px; font-weight: bold; color: var(--primary); display: block; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -232,15 +234,21 @@
     </section>
 
     <section id="config" class="hidden">
-        <h3>Configurações</h3>
-        <label class="config-label">Recibo</label><textarea id="msgRecibo"></textarea>
-        <label class="config-label">Cobrança</label><textarea id="msgCobranca"></textarea>
-        <label class="config-label">Boas-Vindas</label><textarea id="msgBoasVindas"></textarea>
-        <button class="btn btn-primary" onclick="salvarConfig()" style="padding: 15px; font-size: 14px;">SALVAR</button>
+        <h3>Configurações de Mensagens</h3>
+        <label class="config-label">Recibo (Confirmação)</label>
+        <textarea id="msgRecibo"></textarea>
+        
+        <label class="config-label">Cobrança (Aviso)</label>
+        <textarea id="msgCobranca"></textarea>
+        
+        <label class="config-label">Boas-Vindas (Novo Aluno)</label>
+        <textarea id="msgBoasVindas"></textarea>
+        
+        <button class="btn btn-primary" onclick="salvarConfig()" style="padding: 15px; font-size: 14px;">SALVAR CONFIGURAÇÕES</button>
         <hr>
         <div style="display:flex; gap:8px;">
-            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Backup</button>
-            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Importar</button>
+            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Fazer Backup Geral</button>
+            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Importar Backup</button>
             <input type="file" id="importFile" style="display:none" onchange="importarJSON(event)">
         </div>
     </section>
@@ -251,9 +259,10 @@
     let gastos = JSON.parse(localStorage.getItem('van_gastos_v1')) || [];
     const meses = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     
-    let configMsg = localStorage.getItem('van_msg_recibo') || "*CONFIRMAÇÃO DE PAGAMENTO*\n\nOlá, seu pagamento foi processado.\n- *Passageiro:* {nome}\n- *Mês:* {mes}\n- *Valor:* R$ {valor}\n- *Status:* PAGO ✅";
-    let configCobranca = localStorage.getItem('van_msg_cobranca') || "*AVISO DE VENCIMENTO*\n\nOlá, o pagamento de {nome} ({mes}) ainda não consta no sistema.\n- *Valor:* R$ {valor}";
-    let configBoasVindas = localStorage.getItem('van_msg_boasvindas') || "*BOAS-VINDAS!*\n\nOlá {nome}, cadastro realizado com sucesso!\n- *Vencimento:* Dia {vencimento}\n- *Valor:* R$ {valor}";
+    // MENSAGENS PROFISSIONAIS PADRÃO
+    let configMsg = localStorage.getItem('van_msg_recibo') || "✅ *RECIBO DE PAGAMENTO*\n\nOlá! Confirmamos o recebimento da mensalidade de *{nome}* referente ao mês de *{mes}*.\n\n💰 *Valor:* R$ {valor}\n🙏 Obrigado pela confiança!";
+    let configCobranca = localStorage.getItem('van_msg_cobranca') || "⚠️ *AVISO DE VENCIMENTO*\n\nOlá! Notamos que a mensalidade de *{nome}* ({mes}) ainda não foi identificada no sistema.\n\n💵 *Valor:* R$ {valor}\n\nCaso já tenha realizado o pagamento, favor desconsiderar ou enviar o comprovante. Obrigado!";
+    let configBoasVindas = localStorage.getItem('van_msg_boasvindas') || "🚐 *BEM-VINDO(A) AO TRANSPORTE PRO!*\n\nOlá, o cadastro de *{nome}* foi concluído com sucesso.\n\n📌 *Detalhes:*\n- Vencimento: Todo dia {vencimento}\n- Mensalidade: R$ {valor}\n\nEstamos à disposição para qualquer dúvida!";
 
     const hojeGlobal = new Date();
     const anoAtualGlobal = hojeGlobal.getFullYear();
@@ -266,6 +275,13 @@
         if(tabId === 'painel') renderPainel();
         if(tabId === 'detalhes') renderDetalhes();
         if(tabId === 'fluxo') { preencherFiltroMes(); renderFluxo(); }
+        if(tabId === 'config') preencherCamposConfig();
+    }
+
+    function preencherCamposConfig() {
+        document.getElementById('msgRecibo').value = configMsg;
+        document.getElementById('msgCobranca').value = configCobranca;
+        document.getElementById('msgBoasVindas').value = configBoasVindas;
     }
 
     function renderPainel() {
@@ -297,7 +313,6 @@
             let rowHtml = `<td><div>${p.nome}</div><div class="info-sub">Resp: ${p.responsavel || '---'}</div><div style="display: flex; align-items: center; justify-content: space-between; margin-top:6px;"><span class="badge-turno ${getTurnoClass(p.turno)}">${p.turno}</span><a class="btn-ws" onclick="abrirZap('${p.telefone}')">💬</a></div></td>`;
 
             meses.forEach((m) => {
-                // CHAVE PROTEGIDA CONTRA VIRADA DE ANO
                 const chaveAno = `${m}_${anoAtual}`;
                 const isPago = p.pagamentos && p.pagamentos[chaveAno];
                 
@@ -347,7 +362,6 @@
         const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const anoAtual = new Date().getFullYear();
         
-        // Adiciona histórico do ano anterior e do atual
         [anoAtual - 1, anoAtual].forEach(ano => {
             nomesMeses.forEach((nome, index) => {
                 const option = document.createElement('option');
@@ -362,7 +376,7 @@
     document.getElementById('formGasto').addEventListener('submit', (e) => {
         e.preventDefault();
         const agora = new Date();
-        const dataSistema = agora.toISOString().split('T')[0]; // Salva YYYY-MM-DD
+        const dataSistema = agora.toISOString().split('T')[0];
 
         const novoGasto = {
             id: Date.now(),
@@ -387,7 +401,6 @@
         const mesChave = nomesAbrev[mesAlvo];
         
         let totalRecebido = 0;
-        // Busca pagamentos que batem com o Mês e Ano selecionados no filtro
         passageiros.forEach(p => {
             const chave = `${mesChave}_${anoAlvo}`;
             if(p.pagamentos && p.pagamentos[chave]) totalRecebido += parseFloat(p.valor || 0);
@@ -425,7 +438,6 @@
         }
     }
 
-    // --- FUNÇÕES AUXILIARES MANTIDAS ---
     function maskTel(i) {
         let v = i.value.replace(/\D/g, "");
         v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
@@ -435,18 +447,21 @@
     function getTurnoClass(t) { return t === 'Manhã' ? 'turno-manha' : t === 'Tarde' ? 'turno-tarde' : 'turno-noite'; }
     function atualizarContador() { document.getElementById('totalPassageiros').innerText = `Total: ${passageiros.length} passageiros`; }
     function abrirZap(t) { window.open(`https://wa.me/55${t.replace(/\D/g,'')}`, '_blank'); }
+    
     function enviarRecibo(id, mes) {
         const p = passageiros.find(x => x.id == id);
         const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
         let t = configMsg.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
         window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
     }
+    
     function enviarCobranca(id, mes) {
         const p = passageiros.find(x => x.id == id);
         const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
         let t = configCobranca.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
         window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
     }
+
     document.getElementById('formCadastro').addEventListener('submit', (e) => {
         e.preventDefault();
         const id = document.getElementById('editId').value;
@@ -461,12 +476,22 @@
             telefone: document.getElementById('telefone').value, 
             pagamentos: id ? (passageiros.find(x => x.id == id).pagamentos || {}) : {} 
         };
+
         if(id) passageiros[passageiros.findIndex(x => x.id == id)] = p;
         else passageiros.push(p);
+        
         localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
+
+        if(document.getElementById('enviarBoasVindas').checked) {
+            const v = p.valor.toLocaleString('pt-br',{minimumFractionDigits:2});
+            let t = configBoasVindas.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{vencimento}/g, p.vencimento).replace(/{valor}/g, v);
+            window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
+        }
+
         e.target.reset(); document.getElementById('editId').value = '';
         showTab('painel');
     });
+
     function renderDetalhes() {
         const corpo = document.getElementById('corpoDetalhes');
         const busca = document.getElementById('buscaAlunoTab').value.toLowerCase();
@@ -476,6 +501,7 @@
             corpo.innerHTML += `<tr><td><strong>${p.nome}</strong><br><small>${p.escola}</small></td><td><button class="btn" style="background:#e2e8f0" onclick="editar(${p.id})">✏️</button> <button class="btn" style="background:var(--danger);color:white" onclick="excluir(${p.id})">🗑️</button></td></tr>`;
         });
     }
+
     function editar(id) {
         const p = passageiros.find(x => x.id == id);
         document.getElementById('editId').value = p.id;
@@ -488,7 +514,9 @@
         document.getElementById('telefone').value = p.telefone;
         showTab('cadastro');
     }
+
     function excluir(id) { if(confirm("Excluir?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
+
     function salvarConfig() {
         configMsg = document.getElementById('msgRecibo').value;
         configCobranca = document.getElementById('msgCobranca').value;
@@ -496,10 +524,58 @@
         localStorage.setItem('van_msg_recibo', configMsg);
         localStorage.setItem('van_msg_cobranca', configCobranca);
         localStorage.setItem('van_msg_boasvindas', configBoasVindas);
-        alert("Salvo!");
+        alert("Configurações salvas com sucesso!");
     }
-    function exportarJSON() { const blob = new Blob([JSON.stringify({p:passageiros, g:gastos})], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup.json`; a.click(); }
-    function importarJSON(e) { const reader = new FileReader(); reader.onload = (ev) => { const d = JSON.parse(ev.target.result); passageiros = d.p || []; gastos = d.g || []; localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); renderPainel(); }; reader.readAsText(e.target.files[0]); }
+
+    // BACKUP E IMPORTAÇÃO ATUALIZADOS COM FLUXO E CONFIGS
+    function exportarJSON() { 
+        const dadosCompletos = {
+            passageiros: passageiros,
+            gastos: gastos,
+            config: {
+                recibo: configMsg,
+                cobranca: configCobranca,
+                boasVindas: configBoasVindas
+            }
+        };
+        const blob = new Blob([JSON.stringify(dadosCompletos)], {type: 'application/json'}); 
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob); 
+        a.download = `backup_transporte_pro_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; 
+        a.click(); 
+    }
+
+    function importarJSON(e) { 
+        const reader = new FileReader(); 
+        reader.onload = (ev) => { 
+            try {
+                const d = JSON.parse(ev.target.result); 
+                
+                // Suporte para backup novo (objeto) ou antigo (array direto)
+                passageiros = d.passageiros || d.p || []; 
+                gastos = d.gastos || d.g || []; 
+
+                if(d.config) {
+                    configMsg = d.config.recibo || configMsg;
+                    configCobranca = d.config.cobranca || configCobranca;
+                    configBoasVindas = d.config.boasVindas || configBoasVindas;
+                    
+                    localStorage.setItem('van_msg_recibo', configMsg);
+                    localStorage.setItem('van_msg_cobranca', configCobranca);
+                    localStorage.setItem('van_msg_boasvindas', configBoasVindas);
+                }
+
+                localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); 
+                localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); 
+                
+                alert("Dados importados com sucesso!");
+                location.reload(); 
+            } catch (err) {
+                alert("Erro ao importar arquivo. Verifique se o formato é válido.");
+            }
+        }; 
+        reader.readAsText(e.target.files[0]); 
+    }
 
     window.onload = () => { renderPainel(); atualizarContador(); };
 </script>
