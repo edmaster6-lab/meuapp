@@ -74,9 +74,13 @@
             margin-top: 8px;
         }
 
-        .tabs { display: flex; gap: 4px; margin-bottom: 15px; position: sticky; top: 0; background: white; z-index: 10; padding: 5px 0; overflow-x: auto; }
+        .nav-wrapper { margin-bottom: 15px; position: sticky; top: 0; background: white; z-index: 10; padding: 5px 0; }
+        .tabs { display: flex; gap: 4px; margin-bottom: 4px; overflow-x: auto; }
+        .tabs-bottom { display: flex; justify-content: center; margin-top: 4px; }
+        
         .tab-btn { flex: 1; min-width: 80px; padding: 12px 5px; border: none; background: #e2e8f0; cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 10px; color: #64748b; text-transform: uppercase; }
         .tab-btn.active { background: var(--primary); color: white; }
+        .tab-btn-large { max-width: 250px; background: #f1f5f9; border: 1px solid #e2e8f0; width: 100%; }
 
         .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; }
@@ -119,15 +123,22 @@
         .btn-ws { background: #25d366; color: white; border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; margin-left: 5px; font-size: 16px; }
 
         .financeiro { margin-top: 15px; padding: 12px; background: #1e293b; border-radius: 10px; color: white; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .fin-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
         .fin-card h4 { margin: 0; font-size: 9px; color: #94a3b8; text-transform: uppercase; }
         .fin-card p { margin: 4px 0 0 0; font-size: 15px; font-weight: bold; }
 
-        .config-label { font-weight: bold; font-size: 13px; display: block; margin-top: 10px; color: var(--primary); }
         .hidden { display: none !important; }
         .info-sub { font-size: 13px; color: #475569; font-weight: 500; display: block; margin-top: 2px; }
         .checkbox-container { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
         .checkbox-container input { width: auto; margin: 0; }
-        .nome-destaque { font-size: 18px; display: block; margin-bottom: 2px; }
+
+        .gasto-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #e2e8f0; }
+        .resumo-lucro { grid-column: span 2; background: #0f172a; border: 1px solid var(--primary); text-align: center; }
+
+        /* Estilos do Filtro */
+        .filtro-container { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .filtro-container label { font-size: 12px; font-weight: bold; color: var(--primary); }
+        .filtro-container select { margin: 0; padding: 8px; font-size: 14px; flex: 1; }
     </style>
 </head>
 <body>
@@ -138,11 +149,16 @@
         <div id="totalPassageiros" class="counter">Total: 0 passageiros</div>
     </header>
 
-    <nav class="tabs">
-        <button class="tab-btn active" id="btn-painel" onclick="showTab('painel')">Pagamentos</button>
-        <button class="tab-btn" id="btn-detalhes" onclick="showTab('detalhes')">Alunos</button>
-        <button class="tab-btn" id="btn-cadastro" onclick="showTab('cadastro')">Novo</button>
-        <button class="tab-btn" id="btn-config" onclick="showTab('config')">Config</button>
+    <nav class="nav-wrapper">
+        <div class="tabs">
+            <button class="tab-btn active" id="btn-painel" onclick="showTab('painel')">Pagamentos</button>
+            <button class="tab-btn" id="btn-detalhes" onclick="showTab('detalhes')">Alunos</button>
+            <button class="tab-btn" id="btn-cadastro" onclick="showTab('cadastro')">Novo</button>
+            <button class="tab-btn" id="btn-config" onclick="showTab('config')">Config</button>
+        </div>
+        <div class="tabs-bottom">
+            <button class="tab-btn tab-btn-large" id="btn-fluxo" onclick="showTab('fluxo')">📊 Fluxo e Gastos da Van</button>
+        </div>
     </nav>
 
     <section id="painel">
@@ -159,8 +175,32 @@
         </div>
     </section>
 
+    <section id="fluxo" class="hidden">
+        <h3>Lançar Gasto Rápido</h3>
+        <form id="formGasto">
+            <input type="text" id="gastoDesc" placeholder="Descrição (ex: Diesel)" required>
+            <input type="number" step="0.01" id="gastoValor" placeholder="Valor R$" required>
+            <button type="submit" class="btn btn-primary" style="background:var(--danger); padding: 15px; font-size: 14px;">LANÇAR DESPESA AGORA</button>
+        </form>
+        
+        <hr>
+        
+        <div class="filtro-container">
+            <label>Filtrar Período:</label>
+            <select id="filtroMesFluxo" onchange="renderFluxo()"></select>
+        </div>
+
+        <div class="financeiro">
+            <div class="fin-card"><h4>Recebido</h4><p id="fluxoRecebido" style="color:var(--success)">R$ 0,00</p></div>
+            <div class="fin-card"><h4>Gastos</h4><p id="fluxoGastos" style="color:var(--danger)">R$ 0,00</p></div>
+            <div class="fin-card resumo-lucro"><h4>Lucro Real do Período</h4><p id="fluxoLucro" style="font-size: 22px;">R$ 0,00</p></div>
+        </div>
+        
+        <div id="listaGastos" style="margin-top: 15px;"></div>
+    </section>
+
     <section id="detalhes" class="hidden">
-        <input type="text" id="buscaAlunoTab" placeholder="🔍 Buscar aluno ou escola..." onkeyup="renderDetalhes()">
+        <input type="text" id="buscaAlunoTab" placeholder="🔍 Buscar aluno..." onkeyup="renderDetalhes()">
         <div class="table-container" style="min-width: 100%;">
             <table style="min-width: 100%;">
                 <thead><tr><th>Aluno / Escola / Turno</th><th>Ações</th></tr></thead>
@@ -173,21 +213,21 @@
         <form id="formCadastro">
             <input type="hidden" id="editId">
             <input type="text" id="nome" placeholder="Nome do Aluno" required>
-            <input type="text" id="responsavel" placeholder="Nome do Responsável">
+            <input type="text" id="responsavel" placeholder="Responsável">
             <input type="text" id="escola" placeholder="Escola">
             <select id="turno">
                 <option value="Manhã">Manhã</option>
                 <option value="Tarde">Tarde</option>
                 <option value="Noite">Noite</option>
             </select>
-            <input type="number" step="0.01" id="valor" placeholder="Valor R$" required>
+            <input type="number" step="0.01" id="valor" placeholder="Mensalidade R$" required>
             <input type="number" id="vencimento" placeholder="Dia Vencimento" required>
             <input type="text" id="telefone" placeholder="Telefone" oninput="maskTel(this)">
             <div class="checkbox-container">
                 <input type="checkbox" id="enviarBoasVindas">
                 <label for="enviarBoasVindas">Enviar boas-vindas</label>
             </div>
-            <button type="submit" class="btn btn-primary">SALVAR</button>
+            <button type="submit" class="btn btn-primary" style="padding: 15px; font-size: 14px;">SALVAR ALUNO</button>
         </form>
     </section>
 
@@ -196,7 +236,7 @@
         <label class="config-label">Recibo</label><textarea id="msgRecibo"></textarea>
         <label class="config-label">Cobrança</label><textarea id="msgCobranca"></textarea>
         <label class="config-label">Boas-Vindas</label><textarea id="msgBoasVindas"></textarea>
-        <button class="btn btn-primary" onclick="salvarConfig()">SALVAR</button>
+        <button class="btn btn-primary" onclick="salvarConfig()" style="padding: 15px; font-size: 14px;">SALVAR</button>
         <hr>
         <div style="display:flex; gap:8px;">
             <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Backup</button>
@@ -208,29 +248,15 @@
 
 <script>
     let passageiros = JSON.parse(localStorage.getItem('van_dados_v1')) || [];
+    let gastos = JSON.parse(localStorage.getItem('van_gastos_v1')) || [];
     const meses = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     
     let configMsg = localStorage.getItem('van_msg_recibo') || "*CONFIRMAÇÃO DE PAGAMENTO*\n\nOlá, seu pagamento foi processado.\n- *Passageiro:* {nome}\n- *Mês:* {mes}\n- *Valor:* R$ {valor}\n- *Status:* PAGO ✅";
     let configCobranca = localStorage.getItem('van_msg_cobranca') || "*AVISO DE VENCIMENTO*\n\nOlá, o pagamento de {nome} ({mes}) ainda não consta no sistema.\n- *Valor:* R$ {valor}";
     let configBoasVindas = localStorage.getItem('van_msg_boasvindas') || "*BOAS-VINDAS!*\n\nOlá {nome}, cadastro realizado com sucesso!\n- *Vencimento:* Dia {vencimento}\n- *Valor:* R$ {valor}";
 
-    function atualizarContador() {
-        document.getElementById('totalPassageiros').innerText = `Total: ${passageiros.length} passageiros`;
-    }
-
-    function getTurnoClass(turno) {
-        if(turno === 'Manhã') return 'turno-manha';
-        if(turno === 'Tarde') return 'turno-tarde';
-        if(turno === 'Noite') return 'turno-noite';
-        return '';
-    }
-
-    function maskTel(i) {
-        let v = i.value.replace(/\D/g, "");
-        v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
-        v = v.replace(/(\d)(\d{4})$/, "$1-$2");
-        i.value = v;
-    }
+    const hojeGlobal = new Date();
+    const anoAtualGlobal = hojeGlobal.getFullYear();
 
     function showTab(tabId) {
         document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
@@ -239,36 +265,20 @@
         document.getElementById('btn-' + tabId).classList.add('active');
         if(tabId === 'painel') renderPainel();
         if(tabId === 'detalhes') renderDetalhes();
-        if(tabId === 'config') {
-            document.getElementById('msgRecibo').value = configMsg;
-            document.getElementById('msgCobranca').value = configCobranca;
-            document.getElementById('msgBoasVindas').value = configBoasVindas;
-        }
-    }
-
-    function salvarConfig() {
-        configMsg = document.getElementById('msgRecibo').value;
-        configCobranca = document.getElementById('msgCobranca').value;
-        configBoasVindas = document.getElementById('msgBoasVindas').value;
-        localStorage.setItem('van_msg_recibo', configMsg);
-        localStorage.setItem('van_msg_cobranca', configCobranca);
-        localStorage.setItem('van_msg_boasvindas', configBoasVindas);
-        alert("Configurações salvas!");
+        if(tabId === 'fluxo') { preencherFiltroMes(); renderFluxo(); }
     }
 
     function renderPainel() {
         const hMeses = document.getElementById('headerMeses');
         const corpo = document.getElementById('corpoPainel');
         const busca = document.getElementById('buscaNome').value.toLowerCase();
-        
         const dataHoje = new Date();
         const diaHoje = dataHoje.getDate();
-        
-        // Pega o mês atual do sistema. Se for Janeiro, tratamos como fora do letivo.
-        const mesAtualReal = dataHoje.getMonth(); // 0 = Jan, 1 = Fev...
-        let mesParaSoma = "Fev"; // Padrão caso estejamos em Janeiro
+        const mesAtualReal = dataHoje.getMonth();
+        const anoAtual = dataHoje.getFullYear();
+        let mesParaSoma = "Fev";
 
-        if (mesAtualReal >= 1) { // De Fev em diante
+        if (mesAtualReal >= 1) {
             const nomeMes = dataHoje.toLocaleString('pt-br', { month: 'short' }).replace('.', '');
             mesParaSoma = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
         }
@@ -280,87 +290,163 @@
         });
 
         corpo.innerHTML = '';
-        let totalRecebido = 0;
-        let totalPendente = 0;
+        let totalRec = 0; let totalPend = 0;
 
         passageiros.forEach(p => {
             if(busca && !p.nome.toLowerCase().includes(busca)) return;
-            
-            let rowHtml = `<td>
-                <div>${p.nome}</div>
-                <div class="info-sub">Resp: ${p.responsavel || '---'}</div>
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-top:6px;">
-                    <span class="badge-turno ${getTurnoClass(p.turno)}">${p.turno}</span>
-                    <a class="btn-ws" onclick="abrirZap('${p.telefone}')">💬</a>
-                </div>
-            </td>`;
+            let rowHtml = `<td><div>${p.nome}</div><div class="info-sub">Resp: ${p.responsavel || '---'}</div><div style="display: flex; align-items: center; justify-content: space-between; margin-top:6px;"><span class="badge-turno ${getTurnoClass(p.turno)}">${p.turno}</span><a class="btn-ws" onclick="abrirZap('${p.telefone}')">💬</a></div></td>`;
 
             meses.forEach((m) => {
-                const isPago = p.pagamentos && p.pagamentos[m];
-                const diaVencimento = parseInt(p.vencimento);
-                const valorNum = parseFloat(p.valor) || 0;
+                // CHAVE PROTEGIDA CONTRA VIRADA DE ANO
+                const chaveAno = `${m}_${anoAtual}`;
+                const isPago = p.pagamentos && p.pagamentos[chaveAno];
                 
-                const isMesDaColunaAtual = (m.toLowerCase() === mesParaSoma.toLowerCase());
+                const diaVenc = parseInt(p.vencimento);
+                const valorNum = parseFloat(p.valor) || 0;
+                const isMesCol = (m.toLowerCase() === mesParaSoma.toLowerCase());
 
-                // Lógica da cobrança: 
-                // Se estamos em Janeiro, idxMesAtual será -1 em relação à lista (Fev-Dez), então ninguém é cobrado em Jan.
-                let deveMostrarCobranca = false;
-                const idxColuna = meses.indexOf(m);
-                const idxMesAtualNoArray = meses.indexOf(mesParaSoma);
+                let deveCobrar = false;
+                const idxCol = meses.indexOf(m);
+                const idxAtu = meses.indexOf(mesParaSoma);
 
-                if (!isPago && mesAtualReal > 0) { // Só cobra de Fev pra frente
-                    if (idxColuna < idxMesAtualNoArray) deveMostrarCobranca = true;
-                    else if (isMesDaColunaAtual && diaHoje >= diaVencimento) deveMostrarCobranca = true;
+                if (!isPago && mesAtualReal > 0) {
+                    if (idxCol < idxAtu) deveCobrar = true;
+                    else if (isMesCol && diaHoje >= diaVenc) deveCobrar = true;
                 }
 
-                // SOMA: Só soma se o mês do sistema for Fev ou maior
-                if(isMesDaColunaAtual && mesAtualReal > 0) { 
-                    if(isPago) totalRecebido += valorNum; 
-                    else totalPendente += valorNum; 
+                if(isMesCol && mesAtualReal > 0) { 
+                    if(isPago) totalRec += valorNum; else totalPend += valorNum; 
                 }
 
-                rowHtml += `<td>
-                    <span class="status-badge ${isPago ? 'status-pago' : 'status-aberto'}">${isPago ? 'PAGO' : 'ABERTO'}</span>
-                    <button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1" onclick="togglePagamento(${p.id}, '${m}')">Alt</button>
-                    ${isPago ? `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : (deveMostrarCobranca ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')}
-                </td>`;
+                rowHtml += `<td><span class="status-badge ${isPago ? 'status-pago' : 'status-aberto'}">${isPago ? 'PAGO' : 'ABERTO'}</span><button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1" onclick="togglePagamento(${p.id}, '${m}', ${anoAtual})">Alt</button>${isPago ? `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : (deveCobrar ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')}</td>`;
             });
-            const tr = document.createElement('tr');
-            tr.innerHTML = rowHtml;
-            corpo.appendChild(tr);
+            const tr = document.createElement('tr'); tr.innerHTML = rowHtml; corpo.appendChild(tr);
         });
 
-        // Se for Janeiro, mostra "---" ou "Fev (Prev)"
-        const rotuloMes = (mesAtualReal === 0) ? "Jan (Off)" : mesParaSoma;
-        document.getElementById('txtMesAtivo').innerText = rotuloMes;
-        document.getElementById('txtMesAtivo2').innerText = rotuloMes;
-        document.getElementById('mRecebido').innerText = `R$ ${totalRecebido.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
-        document.getElementById('mReceber').innerText = `R$ ${totalPendente.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
+        const rotulo = (mesAtualReal === 0) ? "Jan (Off)" : mesParaSoma;
+        document.getElementById('txtMesAtivo').innerText = rotulo;
+        document.getElementById('txtMesAtivo2').innerText = rotulo;
+        document.getElementById('mRecebido').innerText = `R$ ${totalRec.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
+        document.getElementById('mReceber').innerText = `R$ ${totalPend.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
         atualizarContador();
     }
 
-    function togglePagamento(id, mes) {
+    function togglePagamento(id, mes, ano) {
         const p = passageiros.find(x => x.id == id);
         if(!p.pagamentos) p.pagamentos = {};
-        p.pagamentos[mes] = !p.pagamentos[mes];
+        const chave = `${mes}_${ano}`;
+        p.pagamentos[chave] = !p.pagamentos[chave];
         localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
         renderPainel();
     }
 
+    function preencherFiltroMes() {
+        const seletor = document.getElementById('filtroMesFluxo');
+        if(seletor.options.length > 0) return;
+
+        const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const anoAtual = new Date().getFullYear();
+        
+        // Adiciona histórico do ano anterior e do atual
+        [anoAtual - 1, anoAtual].forEach(ano => {
+            nomesMeses.forEach((nome, index) => {
+                const option = document.createElement('option');
+                option.value = `${index}-${ano}`;
+                option.text = `${nome} / ${ano}`;
+                if(ano === anoAtual && index === new Date().getMonth()) option.selected = true;
+                seletor.appendChild(option);
+            });
+        });
+    }
+
+    document.getElementById('formGasto').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const agora = new Date();
+        const dataSistema = agora.toISOString().split('T')[0]; // Salva YYYY-MM-DD
+
+        const novoGasto = {
+            id: Date.now(),
+            desc: document.getElementById('gastoDesc').value,
+            valor: parseFloat(document.getElementById('gastoValor').value),
+            data: dataSistema 
+        };
+        
+        gastos.push(novoGasto);
+        localStorage.setItem('van_gastos_v1', JSON.stringify(gastos));
+        e.target.reset();
+        renderFluxo();
+    });
+
+    function renderFluxo() {
+        const lista = document.getElementById('listaGastos');
+        const filtro = document.getElementById('filtroMesFluxo').value.split('-');
+        const mesAlvo = parseInt(filtro[0]);
+        const anoAlvo = parseInt(filtro[1]);
+
+        const nomesAbrev = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+        const mesChave = nomesAbrev[mesAlvo];
+        
+        let totalRecebido = 0;
+        // Busca pagamentos que batem com o Mês e Ano selecionados no filtro
+        passageiros.forEach(p => {
+            const chave = `${mesChave}_${anoAlvo}`;
+            if(p.pagamentos && p.pagamentos[chave]) totalRecebido += parseFloat(p.valor || 0);
+        });
+
+        let totalGastos = 0;
+        lista.innerHTML = `<h4>Histórico de Gastos - ${mesChave}/${anoAlvo}</h4>`;
+        
+        gastos.filter(g => {
+            const d = new Date(g.data + 'T00:00:00');
+            return d.getMonth() === mesAlvo && d.getFullYear() === anoAlvo;
+        }).forEach(g => {
+            totalGastos += g.valor;
+            const [ano, mes, dia] = g.data.split('-');
+            const dataFormatada = `${dia}/${mes}/${ano}`;
+            
+            lista.innerHTML += `<div class="gasto-item">
+                <span><strong>${g.desc}</strong><br><small>${dataFormatada}</small></span>
+                <span>R$ ${g.valor.toLocaleString('pt-br',{minimumFractionDigits:2})} <button onclick="removerGasto(${g.id})" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold; padding: 5px;">X</button></span>
+            </div>`;
+        });
+
+        document.getElementById('fluxoRecebido').innerText = `R$ ${totalRecebido.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
+        document.getElementById('fluxoGastos').innerText = `R$ ${totalGastos.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
+        const lucro = totalRecebido - totalGastos;
+        document.getElementById('fluxoLucro').innerText = `R$ ${lucro.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
+        document.getElementById('fluxoLucro').style.color = lucro >= 0 ? 'var(--success)' : 'var(--danger)';
+    }
+
+    function removerGasto(id) {
+        if(confirm("Excluir este gasto?")) {
+            gastos = gastos.filter(g => g.id !== id);
+            localStorage.setItem('van_gastos_v1', JSON.stringify(gastos));
+            renderFluxo();
+        }
+    }
+
+    // --- FUNÇÕES AUXILIARES MANTIDAS ---
+    function maskTel(i) {
+        let v = i.value.replace(/\D/g, "");
+        v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+        v = v.replace(/(\d)(\d{4})$/, "$1-$2");
+        i.value = v;
+    }
+    function getTurnoClass(t) { return t === 'Manhã' ? 'turno-manha' : t === 'Tarde' ? 'turno-tarde' : 'turno-noite'; }
+    function atualizarContador() { document.getElementById('totalPassageiros').innerText = `Total: ${passageiros.length} passageiros`; }
+    function abrirZap(t) { window.open(`https://wa.me/55${t.replace(/\D/g,'')}`, '_blank'); }
     function enviarRecibo(id, mes) {
         const p = passageiros.find(x => x.id == id);
-        const valorF = parseFloat(p.valor).toLocaleString('pt-br', {minimumFractionDigits:2});
-        let textoFinal = configMsg.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, valorF);
-        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(textoFinal)}`, '_blank');
+        const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
+        let t = configMsg.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
+        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
     }
-
     function enviarCobranca(id, mes) {
         const p = passageiros.find(x => x.id == id);
-        const valorF = parseFloat(p.valor).toLocaleString('pt-br', {minimumFractionDigits:2});
-        let textoFinal = configCobranca.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, valorF);
-        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(textoFinal)}`, '_blank');
+        const v = parseFloat(p.valor).toLocaleString('pt-br',{minimumFractionDigits:2});
+        let t = configCobranca.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
+        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
     }
-
     document.getElementById('formCadastro').addEventListener('submit', (e) => {
         e.preventDefault();
         const id = document.getElementById('editId').value;
@@ -378,20 +464,18 @@
         if(id) passageiros[passageiros.findIndex(x => x.id == id)] = p;
         else passageiros.push(p);
         localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
+        e.target.reset(); document.getElementById('editId').value = '';
         showTab('painel');
     });
-
     function renderDetalhes() {
         const corpo = document.getElementById('corpoDetalhes');
+        const busca = document.getElementById('buscaAlunoTab').value.toLowerCase();
         corpo.innerHTML = '';
         passageiros.forEach(p => {
-            corpo.innerHTML += `<tr>
-                <td><strong>${p.nome}</strong><br><small>${p.escola}</small></td>
-                <td><button class="btn" onclick="editar(${p.id})">✏️</button> <button class="btn" onclick="excluir(${p.id})">🗑️</button></td>
-            </tr>`;
+            if(busca && !p.nome.toLowerCase().includes(busca)) return;
+            corpo.innerHTML += `<tr><td><strong>${p.nome}</strong><br><small>${p.escola}</small></td><td><button class="btn" style="background:#e2e8f0" onclick="editar(${p.id})">✏️</button> <button class="btn" style="background:var(--danger);color:white" onclick="excluir(${p.id})">🗑️</button></td></tr>`;
         });
     }
-
     function editar(id) {
         const p = passageiros.find(x => x.id == id);
         document.getElementById('editId').value = p.id;
@@ -404,18 +488,18 @@
         document.getElementById('telefone').value = p.telefone;
         showTab('cadastro');
     }
-
     function excluir(id) { if(confirm("Excluir?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
-    function abrirZap(t) { window.open(`https://wa.me/55${t.replace(/\D/g,'')}`, '_blank'); }
-    function exportarJSON() { const blob = new Blob([JSON.stringify(passageiros)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup.json`; a.click(); }
-    function importarJSON(e) { const reader = new FileReader(); reader.onload = (ev) => { passageiros = JSON.parse(ev.target.result); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderPainel(); }; reader.readAsText(e.target.files[0]); }
-
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
-      });
+    function salvarConfig() {
+        configMsg = document.getElementById('msgRecibo').value;
+        configCobranca = document.getElementById('msgCobranca').value;
+        configBoasVindas = document.getElementById('msgBoasVindas').value;
+        localStorage.setItem('van_msg_recibo', configMsg);
+        localStorage.setItem('van_msg_cobranca', configCobranca);
+        localStorage.setItem('van_msg_boasvindas', configBoasVindas);
+        alert("Salvo!");
     }
+    function exportarJSON() { const blob = new Blob([JSON.stringify({p:passageiros, g:gastos})], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup.json`; a.click(); }
+    function importarJSON(e) { const reader = new FileReader(); reader.onload = (ev) => { const d = JSON.parse(ev.target.result); passageiros = d.p || []; gastos = d.g || []; localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); renderPainel(); }; reader.readAsText(e.target.files[0]); }
 
     window.onload = () => { renderPainel(); atualizarContador(); };
 </script>
