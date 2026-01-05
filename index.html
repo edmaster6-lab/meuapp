@@ -146,7 +146,7 @@
     </nav>
 
     <section id="painel">
-        <input type="text" id="buscaNome" placeholder="🔍 Buscar aluno, escola ou responsável..." onkeyup="renderPainel()">
+        <input type="text" id="buscaNome" placeholder="🔍 Buscar aluno..." onkeyup="renderPainel()">
         <div class="table-container">
             <table>
                 <thead><tr id="headerMeses"></tr></thead>
@@ -154,8 +154,8 @@
             </table>
         </div>
         <div class="financeiro">
-            <div class="fin-card"><h4>Recebido (<span id="txtMesAtivo">...</span>)</h4><p id="mRecebido" style="color:var(--success)">R$ 0,00</p></div>
-            <div class="fin-card"><h4>Pendente (<span id="txtMesAtivo2">...</span>)</h4><p id="mReceber" style="color:var(--warning)">R$ 0,00</p></div>
+            <div class="fin-card"><h4>Recebido (<span id="txtMesAtivo">---</span>)</h4><p id="mRecebido" style="color:var(--success)">R$ 0,00</p></div>
+            <div class="fin-card"><h4>Pendente (<span id="txtMesAtivo2">---</span>)</h4><p id="mReceber" style="color:var(--warning)">R$ 0,00</p></div>
         </div>
     </section>
 
@@ -173,34 +173,34 @@
         <form id="formCadastro">
             <input type="hidden" id="editId">
             <input type="text" id="nome" placeholder="Nome do Aluno" required>
-            <input type="text" id="responsavel" placeholder="Nome do Pai ou Responsável">
-            <input type="text" id="escola" placeholder="Nome da Escola">
+            <input type="text" id="responsavel" placeholder="Nome do Responsável">
+            <input type="text" id="escola" placeholder="Escola">
             <select id="turno">
                 <option value="Manhã">Manhã</option>
                 <option value="Tarde">Tarde</option>
                 <option value="Noite">Noite</option>
             </select>
-            <input type="number" step="0.01" id="valor" placeholder="Valor Mensalidade R$" required>
-            <input type="number" id="vencimento" placeholder="Dia Vencimento (1-31)" required>
-            <input type="text" id="telefone" placeholder="Telefone (DDD) 99999-9999" oninput="maskTel(this)">
+            <input type="number" step="0.01" id="valor" placeholder="Valor R$" required>
+            <input type="number" id="vencimento" placeholder="Dia Vencimento" required>
+            <input type="text" id="telefone" placeholder="Telefone" oninput="maskTel(this)">
             <div class="checkbox-container">
                 <input type="checkbox" id="enviarBoasVindas">
-                <label for="enviarBoasVindas">Enviar boas-vindas ao salvar</label>
+                <label for="enviarBoasVindas">Enviar boas-vindas</label>
             </div>
-            <button type="submit" class="btn btn-primary" style="padding:15px; font-size:14px">SALVAR DADOS</button>
+            <button type="submit" class="btn btn-primary">SALVAR</button>
         </form>
     </section>
 
     <section id="config" class="hidden">
         <h3>Configurações</h3>
-        <label class="config-label">Mensagem de Recibo</label><textarea id="msgRecibo"></textarea>
-        <label class="config-label">Mensagem de Cobrança</label><textarea id="msgCobranca"></textarea>
-        <label class="config-label">Mensagem de Boas-Vindas</label><textarea id="msgBoasVindas"></textarea>
-        <button class="btn btn-primary" onclick="salvarConfig()" style="padding:15px; margin-bottom: 20px;">SALVAR CONFIGURAÇÕES</button>
+        <label class="config-label">Recibo</label><textarea id="msgRecibo"></textarea>
+        <label class="config-label">Cobrança</label><textarea id="msgCobranca"></textarea>
+        <label class="config-label">Boas-Vindas</label><textarea id="msgBoasVindas"></textarea>
+        <button class="btn btn-primary" onclick="salvarConfig()">SALVAR</button>
         <hr>
         <div style="display:flex; gap:8px;">
             <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Backup</button>
-            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Restaurar</button>
+            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Importar</button>
             <input type="file" id="importFile" style="display:none" onchange="importarJSON(event)">
         </div>
     </section>
@@ -208,19 +208,14 @@
 
 <script>
     let passageiros = JSON.parse(localStorage.getItem('van_dados_v1')) || [];
-    // ATENÇÃO: Os índices do array meses correspondem aos meses reais (Fev = idx 0, Mar = idx 1, etc)
     const meses = ["Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     
-    const msgPadraoRecibo = "*CONFIRMAÇÃO DE PAGAMENTO*\n\nOlá, seu pagamento foi processado.\n- *Passageiro:* {nome}\n- *Mês:* {mes}\n- *Valor:* R$ {valor}\n- *Status:* PAGO ✅";
-    const msgPadraoCobranca = "*AVISO DE VENCIMENTO*\n\nOlá, o pagamento de {nome} ({mes}) ainda não consta no sistema.\n- *Valor:* R$ {valor}";
-    const msgPadraoBoasVindas = "*BOAS-VINDAS!*\n\nOlá {nome}, cadastro realizado com sucesso!\n- *Vencimento:* Dia {vencimento}\n- *Valor:* R$ {valor}";
-
-    let configMsg = localStorage.getItem('van_msg_recibo') || msgPadraoRecibo;
-    let configCobranca = localStorage.getItem('van_msg_cobranca') || msgPadraoCobranca;
-    let configBoasVindas = localStorage.getItem('van_msg_boasvindas') || msgPadraoBoasVindas;
+    let configMsg = localStorage.getItem('van_msg_recibo') || "*CONFIRMAÇÃO DE PAGAMENTO*\n\nOlá, seu pagamento foi processado.\n- *Passageiro:* {nome}\n- *Mês:* {mes}\n- *Valor:* R$ {valor}\n- *Status:* PAGO ✅";
+    let configCobranca = localStorage.getItem('van_msg_cobranca') || "*AVISO DE VENCIMENTO*\n\nOlá, o pagamento de {nome} ({mes}) ainda não consta no sistema.\n- *Valor:* R$ {valor}";
+    let configBoasVindas = localStorage.getItem('van_msg_boasvindas') || "*BOAS-VINDAS!*\n\nOlá {nome}, cadastro realizado com sucesso!\n- *Vencimento:* Dia {vencimento}\n- *Valor:* R$ {valor}";
 
     function atualizarContador() {
-        document.getElementById('totalPassageiros').innerText = `Total: ${passageiros.length} passageiro${passageiros.length !== 1 ? 's' : ''}`;
+        document.getElementById('totalPassageiros').innerText = `Total: ${passageiros.length} passageiros`;
     }
 
     function getTurnoClass(turno) {
@@ -249,7 +244,6 @@
             document.getElementById('msgCobranca').value = configCobranca;
             document.getElementById('msgBoasVindas').value = configBoasVindas;
         }
-        atualizarContador();
     }
 
     function salvarConfig() {
@@ -269,22 +263,28 @@
         
         const dataHoje = new Date();
         const diaHoje = dataHoje.getDate();
-        const mesHojeIdxReal = dataHoje.getMonth(); // 0 = Jan, 1 = Fev...
         
-        // Mapeamos o mês atual para o nosso array (nossa tabela começa em Fev)
-        // Se mesHojeIdxReal é 1 (Fev), o índice no array 'meses' é 0.
-        const mesAtualTabelaIdx = mesHojeIdxReal - 1; 
+        // Pega o mês atual do sistema. Se for Janeiro, tratamos como fora do letivo.
+        const mesAtualReal = dataHoje.getMonth(); // 0 = Jan, 1 = Fev...
+        let mesParaSoma = "Fev"; // Padrão caso estejamos em Janeiro
+
+        if (mesAtualReal >= 1) { // De Fev em diante
+            const nomeMes = dataHoje.toLocaleString('pt-br', { month: 'short' }).replace('.', '');
+            mesParaSoma = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+        }
 
         hMeses.innerHTML = '<th>Passageiro / Responsável</th>';
-        meses.forEach((m, idx) => { 
-            hMeses.innerHTML += `<th style="${idx === mesAtualTabelaIdx ? 'background:var(--primary)' : ''}">${m}</th>`; 
+        meses.forEach((m) => { 
+            const isAtual = (m.toLowerCase() === mesParaSoma.toLowerCase() && mesAtualReal > 0);
+            hMeses.innerHTML += `<th style="${isAtual ? 'background:var(--primary)' : ''}">${m}</th>`; 
         });
 
         corpo.innerHTML = '';
-        let mRec = 0, mPend = 0;
+        let totalRecebido = 0;
+        let totalPendente = 0;
 
         passageiros.forEach(p => {
-            if(busca && !p.nome.toLowerCase().includes(busca) && !p.escola?.toLowerCase().includes(busca) && !p.responsavel?.toLowerCase().includes(busca)) return;
+            if(busca && !p.nome.toLowerCase().includes(busca)) return;
             
             let rowHtml = `<td>
                 <div>${p.nome}</div>
@@ -295,36 +295,34 @@
                 </div>
             </td>`;
 
-            meses.forEach((m, idxMesColuna) => {
+            meses.forEach((m) => {
                 const isPago = p.pagamentos && p.pagamentos[m];
                 const diaVencimento = parseInt(p.vencimento);
+                const valorNum = parseFloat(p.valor) || 0;
                 
-                // Lógica da cobrança:
+                const isMesDaColunaAtual = (m.toLowerCase() === mesParaSoma.toLowerCase());
+
+                // Lógica da cobrança: 
+                // Se estamos em Janeiro, idxMesAtual será -1 em relação à lista (Fev-Dez), então ninguém é cobrado em Jan.
                 let deveMostrarCobranca = false;
-                
-                if (!isPago) {
-                    // 1. Se o mês da coluna já passou em relação ao mês atual
-                    if (idxMesColuna < mesAtualTabelaIdx) {
-                        deveMostrarCobranca = true;
-                    } 
-                    // 2. Se a coluna é o mês atual e o dia de hoje é >= vencimento
-                    else if (idxMesColuna === mesAtualTabelaIdx && diaHoje >= diaVencimento) {
-                        deveMostrarCobranca = true;
-                    }
+                const idxColuna = meses.indexOf(m);
+                const idxMesAtualNoArray = meses.indexOf(mesParaSoma);
+
+                if (!isPago && mesAtualReal > 0) { // Só cobra de Fev pra frente
+                    if (idxColuna < idxMesAtualNoArray) deveMostrarCobranca = true;
+                    else if (isMesDaColunaAtual && diaHoje >= diaVencimento) deveMostrarCobranca = true;
                 }
 
-                if(idxMesColuna === mesAtualTabelaIdx) { 
-                    const valorNum = parseFloat(p.valor) || 0;
-                    if(isPago) mRec += valorNum; else mPend += valorNum; 
+                // SOMA: Só soma se o mês do sistema for Fev ou maior
+                if(isMesDaColunaAtual && mesAtualReal > 0) { 
+                    if(isPago) totalRecebido += valorNum; 
+                    else totalPendente += valorNum; 
                 }
 
                 rowHtml += `<td>
                     <span class="status-badge ${isPago ? 'status-pago' : 'status-aberto'}">${isPago ? 'PAGO' : 'ABERTO'}</span>
                     <button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1" onclick="togglePagamento(${p.id}, '${m}')">Alt</button>
-                    ${isPago ? 
-                        `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : 
-                        (deveMostrarCobranca ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')
-                    }
+                    ${isPago ? `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : (deveMostrarCobranca ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')}
                 </td>`;
             });
             const tr = document.createElement('tr');
@@ -332,12 +330,12 @@
             corpo.appendChild(tr);
         });
 
-        // Atualiza textos do rodapé financeiro
-        const nomeMesAtual = meses[mesAtualTabelaIdx] || "---";
-        document.getElementById('txtMesAtivo').innerText = nomeMesAtual;
-        document.getElementById('txtMesAtivo2').innerText = nomeMesAtual;
-        document.getElementById('mRecebido').innerText = `R$ ${mRec.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
-        document.getElementById('mReceber').innerText = `R$ ${mPend.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
+        // Se for Janeiro, mostra "---" ou "Fev (Prev)"
+        const rotuloMes = (mesAtualReal === 0) ? "Jan (Off)" : mesParaSoma;
+        document.getElementById('txtMesAtivo').innerText = rotuloMes;
+        document.getElementById('txtMesAtivo2').innerText = rotuloMes;
+        document.getElementById('mRecebido').innerText = `R$ ${totalRecebido.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
+        document.getElementById('mReceber').innerText = `R$ ${totalPendente.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
         atualizarContador();
     }
 
@@ -363,12 +361,6 @@
         window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(textoFinal)}`, '_blank');
     }
 
-    function enviarBoasVindas(p) {
-        const valorF = parseFloat(p.valor).toLocaleString('pt-br', {minimumFractionDigits:2});
-        let textoFinal = configBoasVindas.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{vencimento}/g, p.vencimento).replace(/{valor}/g, valorF);
-        window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(textoFinal)}`, '_blank');
-    }
-
     document.getElementById('formCadastro').addEventListener('submit', (e) => {
         e.preventDefault();
         const id = document.getElementById('editId').value;
@@ -386,55 +378,46 @@
         if(id) passageiros[passageiros.findIndex(x => x.id == id)] = p;
         else passageiros.push(p);
         localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
-        if (document.getElementById('enviarBoasVindas').checked) { enviarBoasVindas(p); }
-        e.target.reset(); document.getElementById('editId').value = '';
         showTab('painel');
     });
 
     function renderDetalhes() {
         const corpo = document.getElementById('corpoDetalhes');
-        const busca = document.getElementById('buscaAlunoTab').value.toLowerCase();
         corpo.innerHTML = '';
         passageiros.forEach(p => {
-            if(busca && !p.nome.toLowerCase().includes(busca) && !p.escola?.toLowerCase().includes(busca)) return;
             corpo.innerHTML += `<tr>
-                <td>
-                    <strong class="nome-destaque">${p.nome}</strong>
-                    <small>${p.escola || '---'}</small> - 
-                    <span class="badge-turno ${getTurnoClass(p.turno)}">${p.turno}</span>
-                </td>
-                <td>
-                    <button class="btn" style="background:#e2e8f0" onclick="editar(${p.id})">✏️</button>
-                    <button class="btn" style="background:var(--danger);color:white" onclick="excluir(${p.id})">🗑️</button>
-                </td>
+                <td><strong>${p.nome}</strong><br><small>${p.escola}</small></td>
+                <td><button class="btn" onclick="editar(${p.id})">✏️</button> <button class="btn" onclick="excluir(${p.id})">🗑️</button></td>
             </tr>`;
         });
-        atualizarContador();
     }
 
     function editar(id) {
         const p = passageiros.find(x => x.id == id);
         document.getElementById('editId').value = p.id;
         document.getElementById('nome').value = p.nome;
-        document.getElementById('responsavel').value = p.responsavel || '';
-        document.getElementById('escola').value = p.escola || '';
+        document.getElementById('responsavel').value = p.responsavel;
+        document.getElementById('escola').value = p.escola;
         document.getElementById('turno').value = p.turno;
         document.getElementById('valor').value = p.valor;
         document.getElementById('vencimento').value = p.vencimento;
         document.getElementById('telefone').value = p.telefone;
-        document.getElementById('enviarBoasVindas').checked = false;
         showTab('cadastro');
     }
 
-    function excluir(id) { if(confirm("Remover?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
+    function excluir(id) { if(confirm("Excluir?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
     function abrirZap(t) { window.open(`https://wa.me/55${t.replace(/\D/g,'')}`, '_blank'); }
     function exportarJSON() { const blob = new Blob([JSON.stringify(passageiros)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup.json`; a.click(); }
-    function importarJSON(e) { const reader = new FileReader(); reader.onload = (ev) => { try { passageiros = JSON.parse(ev.target.result); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderPainel(); } catch(err) { alert("Erro"); } }; reader.readAsText(e.target.files[0]); }
-    
-    window.onload = () => {
-        renderPainel();
-        atualizarContador();
-    };
+    function importarJSON(e) { const reader = new FileReader(); reader.onload = (ev) => { passageiros = JSON.parse(ev.target.result); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderPainel(); }; reader.readAsText(e.target.files[0]); }
+
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
+      });
+    }
+
+    window.onload = () => { renderPainel(); atualizarContador(); };
 </script>
 </body>
 </html>
