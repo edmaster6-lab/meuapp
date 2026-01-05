@@ -295,10 +295,12 @@
 
             meses.forEach(m => {
                 const isPago = p.pagamentos && p.pagamentos[m];
-                const vencimentoDia = parseInt(p.vencimento);
+                const diaVencimento = parseInt(p.vencimento);
                 
-                // Lógica Corrigida: Vencido apenas se NÃO está pago E o dia atual >= dia do vencimento
-                const estaVencido = !isPago && (diaAtual >= vencimentoDia);
+                // LÓGICA RIGOROSA: 
+                // 1. Deve estar em aberto (!isPago)
+                // 2. O dia atual deve ser maior ou igual ao dia de vencimento
+                const deveMostrarCobranca = !isPago && (diaAtual >= diaVencimento);
 
                 if(m === mesAtualNome) { 
                     const valorNum = parseFloat(p.valor) || 0;
@@ -308,7 +310,10 @@
                 rowHtml += `<td>
                     <span class="status-badge ${isPago ? 'status-pago' : 'status-aberto'}">${isPago ? 'PAGO' : 'ABERTO'}</span>
                     <button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1" onclick="togglePagamento(${p.id}, '${m}')">Alt</button>
-                    ${isPago ? `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : (estaVencido ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')}
+                    ${isPago ? 
+                        `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : 
+                        (deveMostrarCobranca ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')
+                    }
                 </td>`;
             });
             const tr = document.createElement('tr');
