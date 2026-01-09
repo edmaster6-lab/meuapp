@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
     
-    <title>Transporte Pro</title>
+    <title>Transporte Pro - v1.4</title>
     
     <meta name="theme-color" content="#2563eb">
     
@@ -39,7 +39,6 @@
             --table-header: #1e293b;
         }
 
-        /* Variáveis do Tema Escuro */
         body.dark-mode {
             --bg: #0f172a;
             --container-bg: #1e293b;
@@ -74,11 +73,7 @@
             padding: 10px 0;
         }
 
-        .logo-main {
-            max-width: 200px;
-            height: auto;
-            display: block;
-        }
+        .logo-main { max-width: 200px; height: auto; display: block; }
         
         .header-main .counter {
             font-size: 14px;
@@ -144,35 +139,18 @@
         .fin-card p { margin: 4px 0 0 0; font-size: 15px; font-weight: bold; }
 
         .hidden { display: none !important; }
-        .info-sub { font-size: 13px; color: var(--text-sub); font-weight: 500; display: block; margin-top: 2px; }
         .checkbox-container { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
         .checkbox-container input { width: auto; margin: 0; }
 
-        .gasto-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border); }
-        .resumo-lucro { grid-column: span 2; background: #0f172a; border: 1px solid var(--primary); text-align: center; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 15px; }
-        .carteirinha { width: 100%; max-width: 400px; background: var(--container-bg); border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--primary); position: relative; }
-        .carteirinha-header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 14px; }
-        .carteirinha-corpo { padding: 15px; display: grid; grid-template-columns: 1fr 100px; gap: 10px; }
-        .carteirinha-info p { margin: 5px 0; font-size: 12px; border-bottom: 1px solid var(--border); padding-bottom: 2px; }
-        .carteirinha-info strong { color: var(--primary); font-size: 10px; text-transform: uppercase; display: block; }
-        .foto-aluno { width: 100px; height: 120px; border: 2px dashed var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: var(--bg); position: relative; }
-        .foto-aluno img { width: 100%; height: 100%; object-fit: cover; }
-        .btn-foto { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer; }
-        .carteirinha-footer { padding: 15px; background: var(--bg); display: flex; gap: 10px; }
-        .observacoes-box { grid-column: span 2; background: #fffde7; padding: 8px; border-radius: 6px; font-size: 11px; font-style: italic; border: 1px solid #fef08a; color: #1e293b; }
-        body.dark-mode .observacoes-box { background: #334155; color: white; border-color: var(--primary); }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 15px; }
+        .modal-cont { width: 100%; max-width: 450px; background: var(--container-bg); border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 2px solid var(--primary); }
+        .modal-header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 14px; }
+        .modal-body { padding: 15px; max-height: 75vh; overflow-y: auto; }
 
         .footer-edsoft { text-align: center; padding: 20px 0; font-size: 12px; color: var(--text-sub); }
-        .footer-edsoft span { cursor: pointer; text-decoration: underline; }
-        .modal-edsoft { max-width: 320px; text-align: center; padding: 20px; }
-        .img-ed { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px; border: 3px solid var(--primary); }
+        .footer-edsoft span { cursor: pointer; text-decoration: underline; font-weight: bold; }
 
-        .config-toggle {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px;
-        }
+        .config-toggle { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -188,7 +166,7 @@
         <div class="tabs">
             <button class="tab-btn active" id="btn-painel" onclick="showTab('painel')">Pagamentos</button>
             <button class="tab-btn" id="btn-detalhes" onclick="showTab('detalhes')">Alunos</button>
-            <button class="tab-btn" id="btn-cadastro" onclick="showTab('cadastro')">Novo</button>
+            <button class="tab-btn" id="btn-novo" onclick="abrirNovoModal()">+ Novo</button>
             <button class="tab-btn" id="btn-config" onclick="showTab('config')">Config</button>
         </div>
         <div class="tabs-bottom">
@@ -219,13 +197,14 @@
         </form>
         <hr>
         <div id="filtroContainer" class="container" style="background:var(--bg); margin-bottom:15px; padding:10px;">
-            <label style="font-size:12px; font-weight:bold;">Filtrar Período:</label>
             <select id="filtroMesFluxo" onchange="renderFluxo()"></select>
         </div>
         <div class="financeiro">
             <div class="fin-card"><h4>Recebido</h4><p id="fluxoRecebido" style="color:var(--success)">R$ 0,00</p></div>
             <div class="fin-card"><h4>Gastos</h4><p id="fluxoGastos" style="color:var(--danger)">R$ 0,00</p></div>
-            <div class="fin-card resumo-lucro"><h4>Lucro Real do Período</h4><p id="fluxoLucro" style="font-size: 22px;">R$ 0,00</p></div>
+            <div class="fin-card" style="grid-column: span 2; background: #0f172a; border: 1px solid var(--primary); text-align: center;">
+                <h4>Lucro Real do Período</h4><p id="fluxoLucro" style="font-size: 22px;">R$ 0,00</p>
+            </div>
         </div>
         <div id="listaGastos" style="margin-top: 15px;"></div>
     </section>
@@ -240,92 +219,86 @@
         </div>
     </section>
 
-    <section id="cadastro" class="hidden">
-        <form id="formCadastro">
-            <input type="hidden" id="editId">
-            <input type="text" id="nome" placeholder="Nome do Aluno" required>
-            <input type="text" id="responsavel" placeholder="Responsável">
-            <input type="text" id="escola" placeholder="Escola">
-            <select id="turno">
-                <option value="Manhã">Manhã</option>
-                <option value="Tarde">Tarde</option>
-                <option value="Noite">Noite</option>
-            </select>
-            <input type="number" step="0.01" id="valor" placeholder="Mensalidade R$" required>
-            <input type="number" id="vencimento" placeholder="Dia Vencimento" required>
-            <input type="text" id="telefone" placeholder="Telefone" oninput="maskTel(this)">
-            
-            <input type="text" id="endereco" placeholder="Endereço Completo">
-            <input type="text" id="bairro" placeholder="Bairro">
-            <textarea id="observacoes" placeholder="Observações (opcional)"></textarea>
-
-            <div class="checkbox-container">
-                <input type="checkbox" id="enviarBoasVindas">
-                <label for="enviarBoasVindas">Enviar boas-vindas WhatsApp</label>
-            </div>
-            <button type="submit" class="btn btn-primary" style="padding: 15px; font-size: 14px;">SALVAR CADASTRO</button>
-            <button type="button" class="btn" style="width:100%; margin-top:10px; background:#94a3b8; color:white;" onclick="showTab('painel')">CANCELAR</button>
-        </form>
-    </section>
-
     <section id="config" class="hidden">
-        <h3>Configurações do Sistema</h3>
-        
+        <h3>Configurações</h3>
         <div class="config-toggle">
             <span style="font-weight: bold;">Ativar Tema Escuro</span>
             <input type="checkbox" id="toggleDarkMode" onchange="toggleTheme()" style="width: 20px; height: 20px; margin: 0;">
         </div>
-
-        <label class="config-label">Recibo (Confirmação)</label>
-        <textarea id="msgRecibo"></textarea>
-        <label class="config-label">Cobrança (Aviso)</label>
-        <textarea id="msgCobranca"></textarea>
-        <label class="config-label">Boas-Vindas (Novo Aluno)</label>
-        <textarea id="msgBoasVindas"></textarea>
+        <textarea id="msgRecibo" placeholder="Recibo"></textarea>
+        <textarea id="msgCobranca" placeholder="Cobrança"></textarea>
+        <textarea id="msgBoasVindas" placeholder="Boas-vindas"></textarea>
         <button class="btn btn-primary" onclick="salvarConfig()" style="padding: 15px; font-size: 14px;">SALVAR CONFIGURAÇÕES</button>
         <hr>
         <div style="display:flex; gap:8px;">
-            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Fazer Backup Geral</button>
-            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Importar Backup</button>
+            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Backup</button>
+            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Importar</button>
             <input type="file" id="importFile" style="display:none" onchange="importarJSON(event)">
         </div>
     </section>
     
     <footer class="footer-edsoft">
-        <span onclick="abrirAgradecimento()">by EdSoft</span>
+        <span onclick="abrirAgradecimento()">by EdSoft (v1.4)</span>
     </footer>
 </div>
 
+<div id="modalCadastro" class="modal-overlay hidden">
+    <div class="modal-cont">
+        <div class="modal-header" id="tituloModalCadastro">Novo Aluno</div>
+        <div class="modal-body">
+            <form id="formCadastro">
+                <input type="hidden" id="editId">
+                <input type="text" id="nome" placeholder="Nome do Aluno" required>
+                <input type="text" id="responsavel" placeholder="Responsável">
+                <input type="text" id="escola" placeholder="Escola">
+                <select id="turno">
+                    <option value="Manhã">Manhã</option>
+                    <option value="Tarde">Tarde</option>
+                    <option value="Noite">Noite</option>
+                </select>
+                <input type="number" step="0.01" id="valor" placeholder="Mensalidade R$" required>
+                <input type="number" id="vencimento" placeholder="Dia Vencimento" required>
+                <input type="text" id="telefone" placeholder="Telefone" oninput="maskTel(this)">
+                <input type="text" id="endereco" placeholder="Endereço Completo">
+                <input type="text" id="bairro" placeholder="Bairro">
+                <textarea id="observacoes" placeholder="Observações (opcional)"></textarea>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="enviarBoasVindas">
+                    <label for="enviarBoasVindas">Enviar boas-vindas WhatsApp</label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="padding: 15px; font-size: 14px;">SALVAR DADOS</button>
+                <button type="button" class="btn" style="width:100%; margin-top:10px; background:#94a3b8; color:white;" onclick="fecharNovoModal()">FECHAR</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div id="modalFicha" class="modal-overlay hidden">
-    <div class="carteirinha">
-        <div class="carteirinha-header">Ficha Individual do Aluno</div>
-        <div class="carteirinha-corpo">
-            <div class="carteirinha-info" id="infoFicha"></div>
-            <div class="foto-aluno">
-                <img id="imgFicha" src="" class="hidden">
+    <div class="modal-cont">
+        <div class="modal-header">Ficha Individual do Aluno</div>
+        <div class="modal-body" style="display: grid; grid-template-columns: 1fr 100px; gap: 10px;">
+            <div id="infoFicha" style="font-size: 12px;"></div>
+            <div style="width: 100px; height: 120px; border: 2px dashed var(--border); border-radius: 8px; overflow: hidden; background: var(--bg); position: relative; display:flex; align-items:center; justify-content:center;">
+                <img id="imgFicha" src="" class="hidden" style="width: 100%; height: 100%; object-fit: cover;">
                 <span id="fotoPlaceholder" style="font-size:10px; color:#94a3b8; text-align:center;">SEM FOTO</span>
                 <input type="file" id="inputFoto" accept="image/*" capture="camera" style="display:none" onchange="processarFoto(event)">
-                <button class="btn-foto" onclick="document.getElementById('inputFoto').click()">FOTO/CÂMERA</button>
+                <button onclick="document.getElementById('inputFoto').click()" style="position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 10px; padding: 5px;">FOTO</button>
             </div>
-            <div class="observacoes-box" id="obsFicha"></div>
-        </div>
-        <div class="carteirinha-footer">
-            <button class="btn btn-primary" id="btnEditarFicha">EDITAR DADOS</button>
-            <button class="btn" style="background:#64748b; color:white; flex:1;" onclick="fecharFicha()">FECHAR</button>
+            <div id="obsFicha" style="grid-column: span 2; background: #fffde7; padding: 8px; border-radius: 6px; font-size: 11px; font-style: italic; border: 1px solid #fef08a; color: #1e293b;"></div>
+            <button class="btn btn-primary" id="btnEditarFicha" style="grid-column: span 2;">EDITAR DADOS</button>
+            <button class="btn" style="background:#64748b; color:white; grid-column: span 2;" onclick="fecharFicha()">FECHAR</button>
         </div>
     </div>
 </div>
 
 <div id="modalEdSoft" class="modal-overlay hidden">
-    <div class="carteirinha modal-edsoft">
-        <img src="ed.png" alt="EdSoft" class="img-ed" onerror="this.style.display='none'">
-        <h3 style="color:var(--primary); margin-top:0;">Agradecimento</h3>
+    <div class="modal-cont" style="text-align: center; padding: 20px;">
+        <img src="ed.png" alt="EdSoft" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 15px;">
+        <h3 style="color:var(--primary); margin-top:0;">Transporte Pro v1.4</h3>
         <p style="font-size: 14px; line-height: 1.5; color: var(--text-sub);">
-            Gostaríamos de expressar nossa sincera gratidão por utilizar o <strong>Transporte Pro</strong>. 
-            É um privilégio para a EdSoft oferecer soluções que facilitem a gestão do seu negócio. 
-            Desejamos muito sucesso em sua jornada!
+            Solução desenvolvida pela <strong>EdSoft</strong> para facilitar sua gestão.<br>Obrigado por usar nosso sistema!
         </p>
-        <button class="btn btn-primary" style="margin-top:15px;" onclick="fecharAgradecimento()">FECHAR</button>
+        <button class="btn btn-primary" onclick="fecharAgradecimento()">FECHAR</button>
     </div>
 </div>
 
@@ -340,16 +313,21 @@
 
     let idAlunoAtivo = null;
 
-    // Lógica do Tema
+    function abrirNovoModal() {
+        document.getElementById('formCadastro').reset();
+        document.getElementById('editId').value = '';
+        document.getElementById('tituloModalCadastro').innerText = "Novo Aluno";
+        document.getElementById('modalCadastro').classList.remove('hidden');
+    }
+
+    function fecharNovoModal() {
+        document.getElementById('modalCadastro').classList.add('hidden');
+    }
+
     function toggleTheme() {
         const isDark = document.getElementById('toggleDarkMode').checked;
-        if(isDark) {
-            document.body.classList.add('dark-mode');
-            localStorage.setItem('van_theme', 'dark');
-        } else {
-            document.body.classList.remove('dark-mode');
-            localStorage.setItem('van_theme', 'light');
-        }
+        document.body.classList.toggle('dark-mode', isDark);
+        localStorage.setItem('van_theme', isDark ? 'dark' : 'light');
     }
 
     function carregarTema() {
@@ -364,7 +342,7 @@
         document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
         document.getElementById(tabId).classList.remove('hidden');
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-' + tabId).classList.add('active');
+        if(document.getElementById('btn-' + tabId)) document.getElementById('btn-' + tabId).classList.add('active');
         if(tabId === 'painel') renderPainel();
         if(tabId === 'detalhes') renderDetalhes();
         if(tabId === 'fluxo') { preencherFiltroMes(); renderFluxo(); }
@@ -441,15 +419,13 @@
         const info = document.getElementById('infoFicha');
         const obs = document.getElementById('obsFicha');
         info.innerHTML = `
-            <p><strong>Nome Completo</strong>${p.nome}</p>
-            <p><strong>Responsável</strong>${p.responsavel || '-'}</p>
-            <p><strong>Escola / Turno</strong>${p.escola} (${p.turno})</p>
-            <p><strong>Telefone</strong>${p.telefone}</p>
-            <p><strong>Endereço</strong>${p.endereco || 'Não informado'}</p>
-            <p><strong>Bairro</strong>${p.bairro || 'Não informado'}</p>
-            <p><strong>Mensalidade</strong>R$ ${parseFloat(p.valor).toFixed(2)} (Dia ${p.vencimento})</p>
+            <p><strong>Nome</strong><br>${p.nome}</p>
+            <p><strong>Resp.</strong><br>${p.responsavel || '-'}</p>
+            <p><strong>Escola</strong><br>${p.escola} (${p.turno})</p>
+            <p><strong>Mensal.</strong><br>R$ ${parseFloat(p.valor).toFixed(2)} (Dia ${p.vencimento})</p>
+            <p><strong>Tel.</strong><br>${p.telefone}</p>
         `;
-        obs.innerText = p.observacoes ? `Observações: ${p.observacoes}` : "Sem observações adicionais.";
+        obs.innerText = p.observacoes ? `Obs: ${p.observacoes}` : "Sem observações.";
         const img = document.getElementById('imgFicha');
         const placeholder = document.getElementById('fotoPlaceholder');
         if(p.foto) { img.src = p.foto; img.classList.remove('hidden'); placeholder.classList.add('hidden'); }
@@ -458,8 +434,7 @@
         document.getElementById('modalFicha').classList.remove('hidden');
     }
 
-    function fecharFicha() { document.getElementById('modalFicha').classList.add('hidden'); idAlunoAtivo = null; }
-
+    function fecharFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
     function abrirAgradecimento() { document.getElementById('modalEdSoft').classList.remove('hidden'); }
     function fecharAgradecimento() { document.getElementById('modalEdSoft').classList.add('hidden'); }
 
@@ -467,10 +442,10 @@
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = (e) => {
                 const base64 = e.target.result;
-                const pIndex = passageiros.findIndex(x => x.id == idAlunoAtivo);
-                passageiros[pIndex].foto = base64;
+                const pIdx = passageiros.findIndex(x => x.id == idAlunoAtivo);
+                passageiros[pIdx].foto = base64;
                 localStorage.setItem('van_dados_v1', JSON.stringify(passageiros));
                 document.getElementById('imgFicha').src = base64;
                 document.getElementById('imgFicha').classList.remove('hidden');
@@ -496,19 +471,12 @@
         const pExistente = id ? passageiros.find(x => x.id == id) : null;
 
         const p = { 
-            id: idNum, 
-            nome: document.getElementById('nome').value, 
-            responsavel: document.getElementById('responsavel').value,
-            escola: document.getElementById('escola').value,
-            turno: document.getElementById('turno').value, 
-            valor: parseFloat(document.getElementById('valor').value), 
-            vencimento: parseInt(document.getElementById('vencimento').value), 
-            telefone: document.getElementById('telefone').value, 
-            endereco: document.getElementById('endereco').value,
-            bairro: document.getElementById('bairro').value,
-            observacoes: document.getElementById('observacoes').value,
-            foto: pExistente ? pExistente.foto : null,
-            pagamentos: pExistente ? (pExistente.pagamentos || {}) : {} 
+            id: idNum, nome: document.getElementById('nome').value, responsavel: document.getElementById('responsavel').value,
+            escola: document.getElementById('escola').value, turno: document.getElementById('turno').value, 
+            valor: parseFloat(document.getElementById('valor').value), vencimento: parseInt(document.getElementById('vencimento').value), 
+            telefone: document.getElementById('telefone').value, endereco: document.getElementById('endereco').value,
+            bairro: document.getElementById('bairro').value, observacoes: document.getElementById('observacoes').value,
+            foto: pExistente ? pExistente.foto : null, pagamentos: pExistente ? (pExistente.pagamentos || {}) : {} 
         };
 
         if(id) passageiros[passageiros.findIndex(x => x.id == id)] = p;
@@ -520,8 +488,7 @@
             let t = configBoasVindas.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{vencimento}/g, p.vencimento).replace(/{valor}/g, v);
             window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
         }
-        e.target.reset(); document.getElementById('editId').value = '';
-        showTab('detalhes');
+        fecharNovoModal(); renderPainel(); renderDetalhes();
     });
 
     function renderDetalhes() {
@@ -550,7 +517,8 @@
         document.getElementById('endereco').value = p.endereco || '';
         document.getElementById('bairro').value = p.bairro || '';
         document.getElementById('observacoes').value = p.observacoes || '';
-        showTab('cadastro');
+        document.getElementById('tituloModalCadastro').innerText = "Editar Aluno";
+        document.getElementById('modalCadastro').classList.remove('hidden');
     }
 
     function preencherFiltroMes() {
@@ -588,7 +556,7 @@
         lista.innerHTML = `<h4 style="font-size:14px; border-bottom:1px solid var(--border); padding-bottom:5px;">Gastos em ${mesChave}/${anoAlvo}</h4>`;
         gastos.filter(g => { const d = new Date(g.data + 'T00:00:00'); return d.getMonth() === mesAlvo && d.getFullYear() === anoAlvo; }).forEach(g => {
             totalGastos += g.valor;
-            lista.innerHTML += `<div class="gasto-item"><span><strong>${g.desc}</strong></span><span>R$ ${g.valor.toLocaleString('pt-br',{minimumFractionDigits:2})} <button onclick="removerGasto(${g.id})" style="color:red; border:none; background:none; font-weight:bold; cursor:pointer;">X</button></span></div>`;
+            lista.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border);"><span><strong>${g.desc}</strong></span><span>R$ ${g.valor.toLocaleString('pt-br',{minimumFractionDigits:2})} <button onclick="removerGasto(${g.id})" style="color:red; border:none; background:none; font-weight:bold; cursor:pointer;">X</button></span></div>`;
         });
         document.getElementById('fluxoRecebido').innerText = `R$ ${totalRecebido.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
         document.getElementById('fluxoGastos').innerText = `R$ ${totalGastos.toLocaleString('pt-br',{minimumFractionDigits:2})}`;
@@ -597,7 +565,7 @@
         document.getElementById('fluxoLucro').style.color = lucro >= 0 ? 'var(--success)' : 'var(--danger)';
     }
 
-    function removerGasto(id) { if(confirm("Excluir este gasto?")) { gastos = gastos.filter(g => g.id !== id); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); renderFluxo(); } }
+    function removerGasto(id) { if(confirm("Excluir?")) { gastos = gastos.filter(g => g.id !== id); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); renderFluxo(); } }
     function maskTel(i) { let v = i.value.replace(/\D/g, ""); v = v.replace(/^(\d{2})(\d)/g, "($1) $2"); v = v.replace(/(\d)(\d{4})$/, "$1-$2"); i.value = v; }
     function getTurnoClass(t) { return t === 'Manhã' ? 'turno-manha' : t === 'Tarde' ? 'turno-tarde' : 'turno-noite'; }
     function atualizarContador() { document.getElementById('totalPassageiros').innerText = `Total: ${passageiros.length} passageiros`; }
@@ -614,7 +582,7 @@
         let t = configCobranca.replace(/{nome}/g, p.nome.toUpperCase()).replace(/{mes}/g, mes.toUpperCase()).replace(/{valor}/g, v);
         window.open(`https://wa.me/55${p.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(t)}`, '_blank');
     }
-    function excluir(id) { if(confirm("Excluir cadastro permanentemente?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); } }
+    function excluir(id) { if(confirm("Excluir permanentemente?")) { passageiros = passageiros.filter(x => x.id != id); localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); renderDetalhes(); renderPainel(); } }
     
     function salvarConfig() {
         configMsg = document.getElementById('msgRecibo').value;
@@ -623,20 +591,13 @@
         localStorage.setItem('van_msg_recibo', configMsg);
         localStorage.setItem('van_msg_cobranca', configCobranca);
         localStorage.setItem('van_msg_boasvindas', configBoasVindas);
-        alert("Configurações salvas!");
+        alert("Salvo!");
     }
 
     function exportarJSON() { 
-        const dados = {
-            passageiros: passageiros,
-            gastos: gastos,
-            config: { recibo: configMsg, cobranca: configCobranca, boasVindas: configBoasVindas },
-            versao: "1.3",
-            data: new Date().toISOString()
-        };
+        const dados = { passageiros, gastos, config: { recibo: configMsg, cobranca: configCobranca, boasVindas: configBoasVindas }};
         const blob = new Blob([JSON.stringify(dados)], {type: 'application/json'}); 
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_van_pro_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click(); 
-        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_van_v1-4.json`; a.click(); 
     }
 
     function importarJSON(e) { 
@@ -644,17 +605,10 @@
         reader.onload = (ev) => { 
             try {
                 const d = JSON.parse(ev.target.result); 
-                passageiros = (d.passageiros || d.p || []).map(p => ({
-                    ...p, endereco: p.endereco || "", bairro: p.bairro || "", observacoes: p.observacoes || "", foto: p.foto || null
-                })); 
-                gastos = d.gastos || d.g || [];
-                if(d.config) {
-                    configMsg = d.config.recibo || configMsg; configCobranca = d.config.cobranca || configCobranca; configBoasVindas = d.config.boasVindas || configBoasVindas;
-                    localStorage.setItem('van_msg_recibo', configMsg); localStorage.setItem('van_msg_cobranca', configCobranca); localStorage.setItem('van_msg_boasvindas', configBoasVindas);
-                }
+                passageiros = d.passageiros || []; gastos = d.gastos || [];
                 localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); 
-                alert("Backup restaurado com sucesso!"); location.reload(); 
-            } catch (err) { alert("Erro ao importar arquivo!"); }
+                location.reload(); 
+            } catch (err) { alert("Erro no arquivo!"); }
         }; 
         reader.readAsText(e.target.files[0]); 
     }
