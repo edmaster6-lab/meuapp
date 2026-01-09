@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
     
-    <title>Transporte Pro - v1.4</title>
+    <title>Transporte Pro - v1.6</title>
     
     <meta name="theme-color" content="#2563eb">
     
@@ -151,6 +151,11 @@
         .footer-edsoft span { cursor: pointer; text-decoration: underline; font-weight: bold; }
 
         .config-toggle { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+
+        /* ESTILO PARA O VALOR BORRADO */
+        .valor-privado { filter: blur(5px); transition: filter 0.2s; user-select: none; }
+        .valor-visivel { filter: blur(0); }
+        .btn-olho { background: none; border: none; cursor: pointer; font-size: 14px; padding: 0 5px; vertical-align: middle; color: var(--primary); }
     </style>
 </head>
 <body>
@@ -238,7 +243,7 @@
     </section>
     
     <footer class="footer-edsoft">
-        <span onclick="abrirAgradecimento()">by EdSoft (v1.4)</span>
+        <span onclick="abrirAgradecimento()">by EdSoft (v1.6)</span>
     </footer>
 </div>
 
@@ -294,7 +299,7 @@
 <div id="modalEdSoft" class="modal-overlay hidden">
     <div class="modal-cont" style="text-align: center; padding: 20px;">
         <img src="ed.png" alt="EdSoft" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 15px;">
-        <h3 style="color:var(--primary); margin-top:0;">Transporte Pro v1.4</h3>
+        <h3 style="color:var(--primary); margin-top:0;">Transporte Pro v1.6</h3>
         <p style="font-size: 14px; line-height: 1.5; color: var(--text-sub);">
             Solução desenvolvida pela <strong>EdSoft</strong> para facilitar sua gestão.<br>Obrigado por usar nosso sistema!
         </p>
@@ -418,11 +423,17 @@
         const p = passageiros.find(x => x.id == id);
         const info = document.getElementById('infoFicha');
         const obs = document.getElementById('obsFicha');
+        const valorFormatado = parseFloat(p.valor).toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
+        
         info.innerHTML = `
             <p><strong>Nome</strong><br>${p.nome}</p>
             <p><strong>Resp.</strong><br>${p.responsavel || '-'}</p>
             <p><strong>Escola</strong><br>${p.escola} (${p.turno})</p>
-            <p><strong>Mensal.</strong><br>R$ ${parseFloat(p.valor).toFixed(2)} (Dia ${p.vencimento})</p>
+            <p><strong>Mensalidade</strong><br>
+                <span id="valorFicha" class="valor-privado">${valorFormatado}</span> 
+                <button class="btn-olho" onclick="togglePrivacidade()">👁️</button>
+                <small>(Dia ${p.vencimento})</small>
+            </p>
             <p><strong>Tel.</strong><br>${p.telefone}</p>
         `;
         obs.innerText = p.observacoes ? `Obs: ${p.observacoes}` : "Sem observações.";
@@ -432,6 +443,11 @@
         else { img.classList.add('hidden'); placeholder.classList.remove('hidden'); }
         document.getElementById('btnEditarFicha').onclick = () => { fecharFicha(); editar(p.id); };
         document.getElementById('modalFicha').classList.remove('hidden');
+    }
+
+    function togglePrivacidade() {
+        const span = document.getElementById('valorFicha');
+        span.classList.toggle('valor-visivel');
     }
 
     function fecharFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
@@ -597,7 +613,7 @@
     function exportarJSON() { 
         const dados = { passageiros, gastos, config: { recibo: configMsg, cobranca: configCobranca, boasVindas: configBoasVindas }};
         const blob = new Blob([JSON.stringify(dados)], {type: 'application/json'}); 
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_van_v1-4.json`; a.click(); 
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_van_v1-6.json`; a.click(); 
     }
 
     function importarJSON(e) { 
