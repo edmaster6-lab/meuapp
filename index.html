@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
     
-    <title>Transporte Pro - v1.6</title>
+    <title>Transporte Pro - v1.0</title>
     
     <meta name="theme-color" content="#2563eb">
     
@@ -39,6 +39,7 @@
             --table-header: #1e293b;
         }
 
+        /* Ajuste de legibilidade para os Turnos no Dark Mode */
         body.dark-mode {
             --bg: #0f172a;
             --container-bg: #1e293b;
@@ -48,8 +49,13 @@
             --border: #334155;
             --input-bg: #0f172a;
             --table-header: #020617;
+            /* Cores de Turno adaptadas para fundo escuro */
             --manha: #1e3a8a;
+            --manha-txt: #bfdbfe;
             --tarde: #7c2d12;
+            --tarde-txt: #ffedd5;
+            --noite: #4c1d95;
+            --noite-txt: #ffffff;
         }
 
         * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s; }
@@ -119,7 +125,7 @@
         .status-pago { background: #dcfce7; color: #166534; }
         .status-aberto { background: #fef9c3; color: #854d0e; }
 
-        .badge-turno { padding: 2px 5px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: inline-block; margin-top: 4px; }
+        .badge-turno { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; display: inline-block; margin-top: 4px; }
         .turno-manha { background: var(--manha); color: var(--manha-txt); }
         .turno-tarde { background: var(--tarde); color: var(--tarde-txt); }
         .turno-noite { background: var(--noite); color: var(--noite-txt); }
@@ -139,6 +145,7 @@
         .fin-card p { margin: 4px 0 0 0; font-size: 15px; font-weight: bold; }
 
         .hidden { display: none !important; }
+        .info-sub { font-size: 13px; color: var(--text-sub); font-weight: 500; display: block; margin-top: 2px; }
         .checkbox-container { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
         .checkbox-container input { width: auto; margin: 0; }
 
@@ -147,20 +154,18 @@
         .modal-header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 14px; }
         .modal-body { padding: 15px; max-height: 75vh; overflow-y: auto; }
 
-        .footer-edsoft { text-align: center; padding: 20px 0; font-size: 12px; color: var(--text-sub); }
-        .footer-edsoft span { cursor: pointer; text-decoration: underline; font-weight: bold; }
-
-        .config-toggle { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-
-        /* ESTILO PARA O VALOR BORRADO */
         .valor-privado { filter: blur(5px); transition: filter 0.2s; user-select: none; }
         .valor-visivel { filter: blur(0); }
         .btn-olho { background: none; border: none; cursor: pointer; font-size: 14px; padding: 0 5px; vertical-align: middle; color: var(--primary); }
+
+        .footer-edsoft { text-align: center; padding: 20px 0; font-size: 12px; color: var(--text-sub); }
+        .footer-edsoft span { cursor: pointer; text-decoration: underline; font-weight: bold; }
+
+        /* Estilo Config Toggle */
+        .config-toggle { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
     </style>
 </head>
-<body>
-
-<div class="container">
+<body class="dark-mode"> <div class="container">
     <header class="header-main">
         <img src="logo.png" alt="Transporte Pro Logo" class="logo-main" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
         <h1 style="display:none">Transporte Pro</h1>
@@ -227,8 +232,8 @@
     <section id="config" class="hidden">
         <h3>Configurações</h3>
         <div class="config-toggle">
-            <span style="font-weight: bold;">Ativar Tema Escuro</span>
-            <input type="checkbox" id="toggleDarkMode" onchange="toggleTheme()" style="width: 20px; height: 20px; margin: 0;">
+            <span style="font-weight: bold;">Tema Escuro</span>
+            <input type="checkbox" id="toggleDarkMode" onchange="toggleTheme()" style="width: 20px; height: 20px; margin: 0;" checked>
         </div>
         <textarea id="msgRecibo" placeholder="Recibo"></textarea>
         <textarea id="msgCobranca" placeholder="Cobrança"></textarea>
@@ -236,14 +241,14 @@
         <button class="btn btn-primary" onclick="salvarConfig()" style="padding: 15px; font-size: 14px;">SALVAR CONFIGURAÇÕES</button>
         <hr>
         <div style="display:flex; gap:8px;">
-            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Backup</button>
-            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Importar</button>
+            <button class="btn btn-primary" onclick="exportarJSON()" style="background:#64748b">Fazer Backup</button>
+            <button class="btn btn-primary" onclick="document.getElementById('importFile').click()" style="background:#94a3b8">Importar Backup</button>
             <input type="file" id="importFile" style="display:none" onchange="importarJSON(event)">
         </div>
     </section>
     
     <footer class="footer-edsoft">
-        <span onclick="abrirAgradecimento()">by EdSoft (v1.6)</span>
+        <span onclick="abrirAgradecimento()">by EdSoft (v1.0)</span>
     </footer>
 </div>
 
@@ -299,9 +304,9 @@
 <div id="modalEdSoft" class="modal-overlay hidden">
     <div class="modal-cont" style="text-align: center; padding: 20px;">
         <img src="ed.png" alt="EdSoft" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 15px;">
-        <h3 style="color:var(--primary); margin-top:0;">Transporte Pro v1.6</h3>
+        <h3 style="color:var(--primary); margin-top:0;">Transporte Pro v1.0</h3>
         <p style="font-size: 14px; line-height: 1.5; color: var(--text-sub);">
-            Solução desenvolvida pela <strong>EdSoft</strong> para facilitar sua gestão.<br>Obrigado por usar nosso sistema!
+            Solução desenvolvida pela <strong>EdSoft</strong>.<br>Obrigado por usar nosso sistema!
         </p>
         <button class="btn btn-primary" onclick="fecharAgradecimento()">FECHAR</button>
     </div>
@@ -337,7 +342,10 @@
 
     function carregarTema() {
         const temaSalvo = localStorage.getItem('van_theme');
-        if(temaSalvo === 'dark') {
+        if(temaSalvo === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('toggleDarkMode').checked = false;
+        } else {
             document.body.classList.add('dark-mode');
             document.getElementById('toggleDarkMode').checked = true;
         }
@@ -613,7 +621,7 @@
     function exportarJSON() { 
         const dados = { passageiros, gastos, config: { recibo: configMsg, cobranca: configCobranca, boasVindas: configBoasVindas }};
         const blob = new Blob([JSON.stringify(dados)], {type: 'application/json'}); 
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_van_v1-6.json`; a.click(); 
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_transporte_pro_v1.json`; a.click(); 
     }
 
     function importarJSON(e) { 
@@ -621,7 +629,13 @@
         reader.onload = (ev) => { 
             try {
                 const d = JSON.parse(ev.target.result); 
-                passageiros = d.passageiros || []; gastos = d.gastos || [];
+                passageiros = (d.passageiros || d.p || []).map(p => ({
+                    ...p, endereco: p.endereco || "", bairro: p.bairro || "", observacoes: p.observacoes || "", foto: p.foto || null
+                })); 
+                gastos = d.gastos || d.g || [];
+                if(d.config) {
+                    configMsg = d.config.recibo || configMsg; configCobranca = d.config.cobranca || configCobranca; configBoasVindas = d.config.boasVindas || configBoasVindas;
+                }
                 localStorage.setItem('van_dados_v1', JSON.stringify(passageiros)); localStorage.setItem('van_gastos_v1', JSON.stringify(gastos)); 
                 location.reload(); 
             } catch (err) { alert("Erro no arquivo!"); }
