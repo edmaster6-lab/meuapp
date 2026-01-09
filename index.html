@@ -24,7 +24,9 @@
             --warning: #facc15;
             --danger: #ef4444;
             --bg: #f1f5f9;
+            --container-bg: #ffffff;
             --text: #1e293b;
+            --text-sub: #64748b;
             --manha: #dbeafe;
             --manha-txt: #1e40af;
             --tarde: #ffedd5;
@@ -32,19 +34,36 @@
             --noite: #4c1d95;
             --noite-txt: #ffffff;
             --zebra: #f8fafc;
+            --border: #e2e8f0;
+            --input-bg: #ffffff;
+            --table-header: #1e293b;
         }
 
-        * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        /* Variáveis do Tema Escuro */
+        body.dark-mode {
+            --bg: #0f172a;
+            --container-bg: #1e293b;
+            --text: #f1f5f9;
+            --text-sub: #94a3b8;
+            --zebra: #334155;
+            --border: #334155;
+            --input-bg: #0f172a;
+            --table-header: #020617;
+            --manha: #1e3a8a;
+            --tarde: #7c2d12;
+        }
+
+        * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s; }
         
         body { 
             background-color: var(--bg); 
             color: var(--text); 
             margin: 0; 
-            padding: calc(env(safe-area-inset-top) + 10px) 10px 40px 10px; /* Padding inferior para o rodapé */
+            padding: calc(env(safe-area-inset-top) + 10px) 10px 40px 10px;
             overflow-x: hidden; 
         }
 
-        .container { max-width: 100%; background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .container { max-width: 100%; background: var(--container-bg); padding: 12px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         
         .header-main { 
             display: flex; 
@@ -63,43 +82,43 @@
         
         .header-main .counter {
             font-size: 14px;
-            color: #64748b;
+            color: var(--text-sub);
             font-weight: bold;
-            background: #f1f5f9;
+            background: var(--bg);
             padding: 4px 15px;
             border-radius: 20px;
             margin-top: 12px;
         }
 
-        .nav-wrapper { margin-bottom: 15px; position: sticky; top: 0; background: white; z-index: 10; padding: 5px 0; }
+        .nav-wrapper { margin-bottom: 15px; position: sticky; top: 0; background: var(--container-bg); z-index: 10; padding: 5px 0; }
         .tabs { display: flex; gap: 4px; margin-bottom: 4px; overflow-x: auto; }
         .tabs-bottom { display: flex; justify-content: center; margin-top: 4px; }
         
-        .tab-btn { flex: 1; min-width: 80px; padding: 12px 5px; border: none; background: #e2e8f0; cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 10px; color: #64748b; text-transform: uppercase; }
+        .tab-btn { flex: 1; min-width: 80px; padding: 12px 5px; border: none; background: var(--bg); cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 10px; color: var(--text-sub); text-transform: uppercase; }
         .tab-btn.active { background: var(--primary); color: white; }
-        .tab-btn-large { max-width: 250px; background: #f1f5f9; border: 1px solid #e2e8f0; width: 100%; }
+        .tab-btn-large { max-width: 250px; background: var(--bg); border: 1px solid var(--border); width: 100%; }
 
-        .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; margin-bottom: 10px; }
+        .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); background: var(--container-bg); margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-        th { background: #1e293b; color: white; padding: 12px; font-size: 11px; text-align: center; }
+        th { background: var(--table-header); color: white; padding: 12px; font-size: 11px; text-align: center; }
         
-        th:first-child { position: sticky; left: 0; z-index: 3; background: #1e293b; text-align: left; min-width: 200px; }
+        th:first-child { position: sticky; left: 0; z-index: 3; background: var(--table-header); text-align: left; min-width: 200px; }
         
         td:first-child { 
             position: sticky; left: 0; z-index: 2; 
             text-align: left; 
-            font-weight: bold; border-right: 2px solid #f1f5f9; 
+            font-weight: bold; border-right: 2px solid var(--bg); 
             font-size: 17px;
             line-height: 1.3;
             padding: 12px 8px;
         }
 
         tbody tr:nth-child(even) td { background-color: var(--zebra); }
-        tbody tr:nth-child(odd) td { background-color: #ffffff; }
+        tbody tr:nth-child(odd) td { background-color: var(--container-bg); }
         tbody tr:nth-child(even) td:first-child { background-color: var(--zebra); }
-        tbody tr:nth-child(odd) td:first-child { background-color: #ffffff; }
+        tbody tr:nth-child(odd) td:first-child { background-color: var(--container-bg); }
 
-        td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 12px; text-align: center; }
+        td { padding: 8px; border-bottom: 1px solid var(--border); font-size: 12px; text-align: center; }
 
         .status-badge { padding: 4px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; display: block; margin-bottom: 4px; }
         .status-pago { background: #dcfce7; color: #166534; }
@@ -110,7 +129,7 @@
         .turno-tarde { background: var(--tarde); color: var(--tarde-txt); }
         .turno-noite { background: var(--noite); color: var(--noite-txt); }
 
-        input, select, textarea { width: 100%; padding: 14px; margin-top: 5px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; background: white; }
+        input, select, textarea { width: 100%; padding: 14px; margin-top: 5px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; background: var(--input-bg); color: var(--text); }
         textarea { height: 100px; font-family: sans-serif; font-size: 14px; resize: none; }
         
         .btn { padding: 8px 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; text-align: center; }
@@ -119,37 +138,41 @@
         .btn-cobranca { background: var(--danger); color: white; margin-top: 4px; width: 100%; display: block; }
         .btn-ws { background: #25d366; color: white; border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; margin-left: 5px; font-size: 16px; }
 
-        .financeiro { margin-top: 15px; padding: 12px; background: #1e293b; border-radius: 10px; color: white; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .financeiro { margin-top: 15px; padding: 12px; background: var(--table-header); border-radius: 10px; color: white; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .fin-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
         .fin-card h4 { margin: 0; font-size: 9px; color: #94a3b8; text-transform: uppercase; }
         .fin-card p { margin: 4px 0 0 0; font-size: 15px; font-weight: bold; }
 
         .hidden { display: none !important; }
-        .info-sub { font-size: 13px; color: #475569; font-weight: 500; display: block; margin-top: 2px; }
+        .info-sub { font-size: 13px; color: var(--text-sub); font-weight: 500; display: block; margin-top: 2px; }
         .checkbox-container { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
         .checkbox-container input { width: auto; margin: 0; }
 
-        .gasto-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #e2e8f0; }
+        .gasto-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border); }
         .resumo-lucro { grid-column: span 2; background: #0f172a; border: 1px solid var(--primary); text-align: center; }
 
-        /* Estilos da Carteirinha Escola */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 15px; }
-        .carteirinha { width: 100%; max-width: 400px; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--primary); position: relative; }
+        .carteirinha { width: 100%; max-width: 400px; background: var(--container-bg); border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--primary); position: relative; }
         .carteirinha-header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 14px; }
         .carteirinha-corpo { padding: 15px; display: grid; grid-template-columns: 1fr 100px; gap: 10px; }
-        .carteirinha-info p { margin: 5px 0; font-size: 12px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
+        .carteirinha-info p { margin: 5px 0; font-size: 12px; border-bottom: 1px solid var(--border); padding-bottom: 2px; }
         .carteirinha-info strong { color: var(--primary); font-size: 10px; text-transform: uppercase; display: block; }
-        .foto-aluno { width: 100px; height: 120px; border: 2px dashed #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #f8fafc; position: relative; }
+        .foto-aluno { width: 100px; height: 120px; border: 2px dashed var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: var(--bg); position: relative; }
         .foto-aluno img { width: 100%; height: 100%; object-fit: cover; }
         .btn-foto { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 10px; padding: 5px; cursor: pointer; }
-        .carteirinha-footer { padding: 15px; background: #f8fafc; display: flex; gap: 10px; }
-        .observacoes-box { grid-column: span 2; background: #fffde7; padding: 8px; border-radius: 6px; font-size: 11px; font-style: italic; border: 1px solid #fef08a; }
+        .carteirinha-footer { padding: 15px; background: var(--bg); display: flex; gap: 10px; }
+        .observacoes-box { grid-column: span 2; background: #fffde7; padding: 8px; border-radius: 6px; font-size: 11px; font-style: italic; border: 1px solid #fef08a; color: #1e293b; }
+        body.dark-mode .observacoes-box { background: #334155; color: white; border-color: var(--primary); }
 
-        /* Estilos do Rodapé e Modal EdSoft */
-        .footer-edsoft { text-align: center; padding: 20px 0; font-size: 12px; color: #94a3b8; }
+        .footer-edsoft { text-align: center; padding: 20px 0; font-size: 12px; color: var(--text-sub); }
         .footer-edsoft span { cursor: pointer; text-decoration: underline; }
         .modal-edsoft { max-width: 320px; text-align: center; padding: 20px; }
         .img-ed { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px; border: 3px solid var(--primary); }
+
+        .config-toggle {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg); padding: 15px; border-radius: 8px; margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -195,7 +218,7 @@
             <button type="submit" class="btn btn-primary" style="background:var(--danger); padding: 15px; font-size: 14px;">LANÇAR DESPESA AGORA</button>
         </form>
         <hr>
-        <div id="filtroContainer" class="container" style="background:#f1f5f9; margin-bottom:15px; padding:10px;">
+        <div id="filtroContainer" class="container" style="background:var(--bg); margin-bottom:15px; padding:10px;">
             <label style="font-size:12px; font-weight:bold;">Filtrar Período:</label>
             <select id="filtroMesFluxo" onchange="renderFluxo()"></select>
         </div>
@@ -246,7 +269,13 @@
     </section>
 
     <section id="config" class="hidden">
-        <h3>Configurações de Mensagens</h3>
+        <h3>Configurações do Sistema</h3>
+        
+        <div class="config-toggle">
+            <span style="font-weight: bold;">Ativar Tema Escuro</span>
+            <input type="checkbox" id="toggleDarkMode" onchange="toggleTheme()" style="width: 20px; height: 20px; margin: 0;">
+        </div>
+
         <label class="config-label">Recibo (Confirmação)</label>
         <textarea id="msgRecibo"></textarea>
         <label class="config-label">Cobrança (Aviso)</label>
@@ -291,7 +320,7 @@
     <div class="carteirinha modal-edsoft">
         <img src="ed.png" alt="EdSoft" class="img-ed" onerror="this.style.display='none'">
         <h3 style="color:var(--primary); margin-top:0;">Agradecimento</h3>
-        <p style="font-size: 14px; line-height: 1.5; color: #475569;">
+        <p style="font-size: 14px; line-height: 1.5; color: var(--text-sub);">
             Gostaríamos de expressar nossa sincera gratidão por utilizar o <strong>Transporte Pro</strong>. 
             É um privilégio para a EdSoft oferecer soluções que facilitem a gestão do seu negócio. 
             Desejamos muito sucesso em sua jornada!
@@ -310,6 +339,26 @@
     let configBoasVindas = localStorage.getItem('van_msg_boasvindas') || "🚐 *BEM-VINDO(A) AO TRANSPORTE PRO!*\n\nOlá, o cadastro de *{nome}* foi concluído com sucesso.\n\n📌 *Detalhes:*\n- Vencimento: Todo dia {vencimento}\n- Mensalidade: R$ {valor}\n\nEstamos à disposição para qualquer dúvida!";
 
     let idAlunoAtivo = null;
+
+    // Lógica do Tema
+    function toggleTheme() {
+        const isDark = document.getElementById('toggleDarkMode').checked;
+        if(isDark) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('van_theme', 'dark');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('van_theme', 'light');
+        }
+    }
+
+    function carregarTema() {
+        const temaSalvo = localStorage.getItem('van_theme');
+        if(temaSalvo === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('toggleDarkMode').checked = true;
+        }
+    }
 
     function showTab(tabId) {
         document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
@@ -373,7 +422,7 @@
                 if(isMesCol && mesAtualReal > 0) { 
                     if(isPago) totalRec += valorNum; else totalPend += valorNum; 
                 }
-                rowHtml += `<td><span class="status-badge ${isPago ? 'status-pago' : 'status-aberto'}">${isPago ? 'PAGO' : 'ABERTO'}</span><button class="btn" style="background:#f8fafc; border:1px solid #cbd5e1" onclick="togglePagamento(${p.id}, '${m}', ${anoAtual})">Alt</button>${isPago ? `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : (deveCobrar ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')}</td>`;
+                rowHtml += `<td><span class="status-badge ${isPago ? 'status-pago' : 'status-aberto'}">${isPago ? 'PAGO' : 'ABERTO'}</span><button class="btn" style="background:var(--bg); border:1px solid var(--border); color:var(--text)" onclick="togglePagamento(${p.id}, '${m}', ${anoAtual})">Alt</button>${isPago ? `<button class="btn btn-recibo" onclick="enviarRecibo(${p.id}, '${m}')">📄 Recibo</button>` : (deveCobrar ? `<button class="btn btn-cobranca" onclick="enviarCobranca(${p.id}, '${m}')">🔔 Cobrar</button>` : '')}</td>`;
             });
             const tr = document.createElement('tr'); tr.innerHTML = rowHtml; corpo.appendChild(tr);
         });
@@ -536,7 +585,7 @@
         let totalRecebido = 0;
         passageiros.forEach(p => { const chave = `${mesChave}_${anoAlvo}`; if(p.pagamentos && p.pagamentos[chave]) totalRecebido += parseFloat(p.valor || 0); });
         let totalGastos = 0;
-        lista.innerHTML = `<h4 style="font-size:14px; border-bottom:1px solid #ddd; padding-bottom:5px;">Gastos em ${mesChave}/${anoAlvo}</h4>`;
+        lista.innerHTML = `<h4 style="font-size:14px; border-bottom:1px solid var(--border); padding-bottom:5px;">Gastos em ${mesChave}/${anoAlvo}</h4>`;
         gastos.filter(g => { const d = new Date(g.data + 'T00:00:00'); return d.getMonth() === mesAlvo && d.getFullYear() === anoAlvo; }).forEach(g => {
             totalGastos += g.valor;
             lista.innerHTML += `<div class="gasto-item"><span><strong>${g.desc}</strong></span><span>R$ ${g.valor.toLocaleString('pt-br',{minimumFractionDigits:2})} <button onclick="removerGasto(${g.id})" style="color:red; border:none; background:none; font-weight:bold; cursor:pointer;">X</button></span></div>`;
@@ -582,7 +631,7 @@
             passageiros: passageiros,
             gastos: gastos,
             config: { recibo: configMsg, cobranca: configCobranca, boasVindas: configBoasVindas },
-            versao: "1.2",
+            versao: "1.3",
             data: new Date().toISOString()
         };
         const blob = new Blob([JSON.stringify(dados)], {type: 'application/json'}); 
@@ -610,7 +659,7 @@
         reader.readAsText(e.target.files[0]); 
     }
 
-    window.onload = () => { renderPainel(); atualizarContador(); };
+    window.onload = () => { carregarTema(); renderPainel(); atualizarContador(); };
 </script>
 </body>
 </html>
